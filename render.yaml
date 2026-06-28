@@ -1,0 +1,25 @@
+services:
+    - type: web_service
+      name: hermes-proxy
+      env: docker
+      repo: https://github.com/yingyaoyao88-svg/hermes-render
+      image:
+        imagePath: nousresearch/hermes-agent:latest
+      plan: free
+      healthCheckPath: /health
+      dockerCommand: gateway run
+      envVars:
+        - key: DEEPSEEK_API_KEY
+          value: sk-e038ee8e039a40c69f5f4b36bde3d953
+        - key: API_SERVER_ENABLED
+          value: "true"
+        - key: API_SERVER_HOST
+          value: 0.0.0.0
+        - key: API_SERVER_PORT
+          value: "8642"
+        - key: API_SERVER_KEY
+          value: hermes888
+        - key: API_SERVER_CORS_ORIGINS
+          value: "*"
+        - key: PORT
+          value: "8642"
