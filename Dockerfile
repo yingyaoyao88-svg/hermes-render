@@ -1,10 +1,6 @@
 FROM python:3.11-slim
-
-  RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates && rm -rf
-   /var/lib/apt/lists/*
-
-  RUN pip install --no-cache-dir hermes-agent
-
-  EXPOSE 8642
-
-  CMD ["hermes", "gateway", "run"]
+RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates && rm -rf
+/var/lib/apt/lists/*
+RUN pip install --no-cache-dir hermes-agent
+EXPOSE 8642
+CMD ["hermes", "gateway", "run"]
