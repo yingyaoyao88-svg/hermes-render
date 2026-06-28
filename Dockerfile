@@ -1,12 +1,11 @@
-FROM python:3.11-alpine
+FROM nousresearch/hermes-agent:latest
 
-RUN pip install --no-cache-dir hermes-agent
-
-RUN mkdir -p /root/.hermes &&     printf 'model:
+# Pre-create config files at build time
+RUN mkdir -p /opt/data &&     printf 'model:
   default: deepseek/deepseek-chat
   provider: deepseek
   base_url: https://api.deepseek.com/v1
-' > /root/.hermes/config.yaml
+' > /opt/data/config.yaml
 
 EXPOSE 8642
 
