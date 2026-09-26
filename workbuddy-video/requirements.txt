@@ -1,0 +1,4 @@
+sherpa-onnx
+soundfile
+numpy
+imageio-ffmpeg

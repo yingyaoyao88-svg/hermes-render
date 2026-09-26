@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>WorkBuddy 第 1 期</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <div id="topbar">
+    <div class="brand">WorkBuddy 从零到一 <span class="ep">第 1 期</span></div>
+    <div id="chapter"></div>
+    <div id="note">界面为示意还原，以实际版本为准</div>
+  </div>
+
+  <div id="window" data-theme="light">
+    <div id="titlebar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>WorkBuddy</span></div>
+    <div id="viewport"><div id="cam"><div id="app">
+
+      <aside id="sidebar">
+        <div class="logo"><div class="mark">W</div>WorkBuddy</div>
+        <div class="nav primary" id="nav-new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>新建任务</div>
+        <div class="nav" id="nav-assist"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>助理</div>
+        <div class="nav" id="nav-project"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 2 6 5.5"/></svg>项目</div>
+        <div class="nav" id="nav-skill"><svg viewBox="0 0 24 24"><path d="M12 2l2.6 6.2L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.4-.8z"/></svg>专家 · 技能 · 连接器</div>
+        <div class="nav" id="nav-auto"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>自动化</div>
+        <div class="nav" id="nav-more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>更多<span class="chev">›</span></div>
+        <div class="sec">任务列表</div>
+        <div id="history">
+          <div class="h" id="h-new" style="display:none">成绩单整理<small>刚刚</small></div>
+          <div class="h">整理本周会议纪要<small>昨天</small></div>
+          <div class="h">周报草稿（第 38 周）<small>周一</small></div>
+          <div class="h">竞品功能对比表<small>9月20日</small></div>
+          <div class="h">客户回访话术优化<small>9月18日</small></div>
+        </div>
+        <div id="avatar"><div class="pic">Y</div><div><b>小叶</b><small>积分 1,280</small></div></div>
+        <div class="menu" id="moreMenu">
+          <div class="it">📚 资料库</div>
+          <div class="it">💡 灵感模板</div>
+        </div>
+        <div class="menu" id="avatarMenu">
+          <div class="it on">📅 每日签到 <span class="mul" style="background:#ffd84d;color:#1b1f33">+20 积分</span></div>
+          <div class="sep"></div>
+          <div class="it">⚙️ 设置</div>
+          <div class="it" id="themeRow">🌓 外观<div class="sw"><span data-v="light">浅色</span><span data-v="dark">深色</span></div></div>
+        </div>
+      </aside>
+
+      <main id="main">
+        <div id="home">
+          <div id="hello"><div class="mark">W</div><span>WorkBuddy，<span class="grad">你的职场超能力</span></span></div>
+          <div id="inputArea">
+            <div id="modes"><div class="m">日常办公</div><div class="m">代码开发</div><div class="m">设计创意</div></div>
+            <div id="inputBox">
+              <div id="inputText"></div>
+              <div id="attach"><div class="x">X</div>成绩单.xlsx<small style="color:var(--muted)">12 KB</small></div>
+              <div class="toolbar">
+                <div id="plusBtn">+</div>
+                <div id="modelBtn"><span class="dot"></span>auto<span style="color:var(--muted)">▾</span></div>
+                <div id="sendBtn">发送任务</div>
+              </div>
+            </div>
+            <div class="below"><div id="wsBtn">📁 <span id="wsName">选择工作空间</span></div><span class="hint">AI 只能访问你选择的文件夹</span></div>
+            <div id="tagsRow"></div>
+            <div class="menu" id="wsMenu">
+              <div class="hd">选择工作空间</div>
+              <div class="it">📁 桌面</div>
+              <div class="it">📁 文档</div>
+              <div class="it">📁 下载</div>
+              <div class="it" id="wsPick" style="display:none">📁 入门跟练<span class="ck">✓</span></div>
+              <div class="sep"></div>
+              <div class="it new">＋ 新建文件夹…</div>
+            </div>
+            <div class="menu" id="plusMenu">
+              <div class="it">📎 上传本地文件</div>
+              <div class="it">📄 腾讯文档</div>
+              <div class="sep"></div>
+              <div class="it">🧩 添加技能</div>
+              <div class="it">🔌 添加连接器</div>
+            </div>
+            <div class="menu" id="modelMenu">
+              <div class="hd">选择模型（数字 = 积分消耗倍数）</div>
+              <div class="it on" id="m-auto"><div>auto<br><small>自动匹配 · 日常够用</small></div><span class="mul">默认</span></div>
+              <div class="it"><div>轻快模型<br><small>简单问答、改写</small></div><span class="mul">0.5x</span></div>
+              <div class="it"><div>标准模型<br><small>常规办公任务</small></div><span class="mul">1x</span></div>
+              <div class="it" id="m-pro"><div>深度模型<br><small>长报告 · 数据分析</small></div><span class="mul">3x</span></div>
+              <div class="scale">省<div class="bar"></div>聪明 / 贵</div>
+              <div class="foot">* 模型名称与倍数以实际界面为准</div>
+            </div>
+          </div>
+          <div id="ideas">
+            <div class="c"><b>📊 整理 Excel 表格</b>清洗、筛选、汇总数据</div>
+            <div class="c"><b>📝 写一份周报</b>根据要点生成周报</div>
+            <div class="c"><b>📑 做一份 PPT</b>从文档一键生成演示</div>
+          </div>
+          <div id="toast"><div class="ic">!</div>找不到文件：还没有选择工作空间，我无法访问你的文件</div>
+        </div>
+
+        <div id="chat">
+          <div id="conv">
+            <div class="chead">成绩单整理 <span class="chip">📁 入门跟练</span></div>
+            <div class="msgs">
+              <div class="u">帮我把这份成绩单整理成 Excel，筛选出不及格的学生、标注成绩区间，最后加一行全班的平均分。<br><span class="f">📗 成绩单.xlsx</span></div>
+              <div class="a" id="steps">
+                <div class="step" data-i="0"><span class="s"></span>正在思考：拆解任务需求</div>
+                <div class="step" data-i="1"><span class="s"></span>正在读取：成绩单.xlsx</div>
+                <div class="step" data-i="2"><span class="s"></span>正在处理：筛选、分区间、计算平均分</div>
+                <div class="done-msg" id="done1" style="display:none">✓ 已完成：生成「成绩整理.xlsx」</div>
+              </div>
+              <div class="u" id="u2" style="display:none">把不及格的标准改成低于 60 分</div>
+              <div class="a" id="a2" style="display:none"><div class="step done"><span class="s">✓</span>已按新标准重新生成</div><div class="done-msg">✓ 已更新「成绩整理.xlsx」（覆盖原文件）</div></div>
+            </div>
+            <div id="chatInput"><span id="chatText"></span><span class="send">发送</span></div>
+          </div>
+          <div id="preview"><div id="previewIn">
+            <div class="phead"><span class="xl">X</span>成绩整理.xlsx<span class="ver" id="ver">v1</span></div>
+            <div id="warn">⚠ 修改会覆盖原文件！满意的版本记得先自己备份一份</div>
+            <table id="table"></table>
+            <div class="crit" id="crit"></div>
+            <div id="fileTree">
+              <div>📁 <b>入门跟练</b>（工作空间）</div>
+              <div style="padding-left:26px">📗 成绩单.xlsx</div>
+              <div style="padding-left:26px">📗 成绩整理.xlsx<span class="new">新生成</span></div>
+            </div>
+          </div></div>
+        </div>
+      </main>
+    </div></div></div>
+  </div>
+
+  <div id="diagram">
+    <h2>工作空间 = <em>AI 的活动范围</em></h2>
+    <div class="pc">
+      <div class="lbl">💻 你的电脑</div>
+      <div class="fd" data-f="桌面"><span class="lock">🔒</span><span class="ico">🗂️</span>桌面</div>
+      <div class="fd" data-f="文档"><span class="lock">🔒</span><span class="ico">🗂️</span>文档</div>
+      <div class="fd dl" id="dlFolder"><span class="ico">📂</span>下载<div class="files">报价单.pdf<br>成绩单.xlsx<br>合同扫描件.png</div></div>
+      <div class="fd" data-f="图片"><span class="lock">🔒</span><span class="ico">🗂️</span>图片</div>
+      <div class="fd" data-f="微信文件"><span class="lock">🔒</span><span class="ico">🗂️</span>微信文件</div>
+      <div class="bot" id="bot">🤖</div>
+      <div class="shield" id="shield">🛡️ 安全：碰不到其他地方</div>
+    </div>
+  </div>
+
+  <div class="marker" id="mk1">1</div><div class="marker" id="mk2">2</div><div class="marker" id="mk3">3</div>
+  <div class="qm">?</div><div class="qm">?</div><div class="qm">?</div><div class="qm">?</div><div class="qm">?</div>
+
+  <div id="spot"></div>
+  <div id="callout"></div>
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9.5-7 1.6 4.2 7.4-3 1.6-4.2-7.4L4 19z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+
+  <div id="cards">
+    <div class="card" id="c-slogan">
+      <div class="kicker">WORKBUDDY 新手系列</div>
+      <h1 data-step="1">从零到一，<br>带你把 <span class="hl">WorkBuddy</span> 学会。</h1>
+      <h3 data-step="2">一期讲透一个功能，每一步都带着你做。</h3>
+    </div>
+    <div class="card" id="c-hook">
+      <div class="kicker">第 1 期</div>
+      <h1 data-step="1">打开 WorkBuddy，<br>我该<span class="hl">点哪</span>？</h1>
+    </div>
+    <div class="card" id="c-agenda">
+      <div class="kicker">这一期你将学会</div>
+      <div class="pills">
+        <div class="pill" data-step="1"><div class="n">STEP 1</div><b>认全界面</b><p>三个必看区域<br>+ 左侧功能区</p></div>
+        <div class="pill" data-step="1"><div class="n">STEP 2</div><b>跑通第一个任务</b><p>指令四要素<br>+ 配置 · 执行 · 修改</p></div>
+      </div>
+      <div class="stamp" data-step="2">看完就正式上手 ✓</div>
+    </div>
+    <div class="card" id="c-chapter2">
+      <div class="kicker">界面认完了</div>
+      <h1>下一步：跑通<span class="hl">第一个任务</span></h1>
+    </div>
+    <div class="card" id="c-four">
+      <div class="kicker">关键在指令怎么写</div>
+      <h1>指令<span class="hl">四要素</span></h1>
+      <div class="four">
+        <div class="q t-目标" data-q="1"><div class="k">目标</div><p>你要它做什么</p><div class="ex">整理成 Excel</div></div>
+        <div class="q t-材料" data-q="2"><div class="k">材料</div><p>给它什么文件</p><div class="ex">这份成绩单</div></div>
+        <div class="q t-格式" data-q="3"><div class="k">格式</div><p>输出成什么样</p><div class="ex">筛选不及格、标注区间</div></div>
+        <div class="q t-要求" data-q="4"><div class="k">要求</div><p>什么风格、什么规则</p><div class="ex">最后加一行平均分</div></div>
+      </div>
+    </div>
+    <div class="card" id="c-summary">
+      <div class="kicker">收尾口诀</div>
+      <div class="row" data-step="1"><div class="lab">界面 · 三看</div><div class="chipx">① 输入框</div><div class="chipx">② 工作空间</div><div class="chipx">③ 模型倍数</div></div>
+      <div class="row" data-step="2"><div class="lab">指令 · 四要素</div><div class="chipx t-目标" style="border-color:var(--c)">目标</div><div class="chipx t-材料" style="border-color:var(--c)">材料</div><div class="chipx t-格式" style="border-color:var(--c)">格式</div><div class="chipx t-要求" style="border-color:var(--c)">要求</div></div>
+    </div>
+    <div class="card" id="c-pits">
+      <div class="kicker">⚠ 新手两个坑</div>
+      <div class="pills" style="flex-direction:column;gap:26px;margin-top:40px">
+        <div class="pit" data-step="1"><div class="n">坑 1</div><b>第一次用，先确认工作空间</b><p>不选 / 选错 → 永远「找不到文件」</p></div>
+        <div class="pit" data-step="2"><div class="n">坑 2</div><b>提修改会覆盖原文件</b><p>重要的版本，先自己备份一份</p></div>
+      </div>
+    </div>
+    <div class="card" id="c-next">
+      <div class="kicker">下期预告 · 第 2 期</div>
+      <h1><span class="hl">Skill</span> 到底是什么？</h1>
+      <div class="row" style="margin-top:50px"><div class="chipx">是什么</div><div class="chipx">怎么挑</div><div class="chipx">怎么装</div><div class="chipx">怎么用</div></div>
+    </div>
+    <div class="card" id="c-cta">
+      <div class="kicker">想跟着做？</div>
+      <h1>评论区扣「<span class="hl">教程</span>」</h1>
+      <div class="pills">
+        <div class="pill"><div class="n">免费领取</div><b>🗺️ 界面速查图</b></div>
+        <div class="pill"><div class="n">免费领取</div><b>📋 指令模板</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="subtitle"><span></span></div>
+  <div id="progress"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

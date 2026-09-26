@@ -1,0 +1,770 @@
+{
+  "meta": {
+    "title": "WorkBuddy 从零到一 · 第 1 期",
+    "subtitle": "认全界面 + 跑通第一个任务",
+    "episode": "第 1 期"
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "chapter": "",
+      "base": {
+        "card": "slogan"
+      },
+      "lines": [
+        {
+          "text": "从零到一，带你把 WorkBuddy 学会。",
+          "state": {
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "一期讲透一个功能，每一步都带着你做。",
+          "state": {
+            "cardStep": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "hook",
+      "chapter": "开场",
+      "base": {
+        "card": "hook"
+      },
+      "lines": [
+        {
+          "text": "第一期，先解决最基本的问题：",
+          "state": {
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "很多人打开 WorkBuddy，看着一堆按钮，第一反应是——我该点哪？",
+          "state": {
+            "card": null,
+            "confused": true,
+            "cursor": "#main",
+            "wander": true
+          }
+        },
+        {
+          "text": "这一期我带你把界面认全，再跑通你的第一个任务。",
+          "state": {
+            "card": "agenda",
+            "confused": null,
+            "wander": null,
+            "cursor": null,
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "看完这期，你就正式上手了。",
+          "state": {
+            "cardStep": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout",
+      "chapter": "一 · 整体布局",
+      "base": {},
+      "lines": [
+        {
+          "text": "先看整体布局。",
+          "state": {}
+        },
+        {
+          "text": "打开之后整个页面就两块：左边一条是功能区，",
+          "state": {
+            "focus": "#sidebar",
+            "label": "功能区"
+          }
+        },
+        {
+          "text": "右边一大片是主操作区。",
+          "state": {
+            "focus": "#main",
+            "label": "主操作区"
+          }
+        },
+        {
+          "text": "你平时 90% 的时间，都待在右边。",
+          "say": "你平时百分之九十的时间，都待在右边。",
+          "state": {
+            "focus": "#main",
+            "label": "90% 的时间都在这里",
+            "big": "90%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "three",
+      "chapter": "二 · 右边必看三个地方",
+      "base": {},
+      "lines": [
+        {
+          "text": "右边必看三个地方。",
+          "state": {
+            "markers": true
+          }
+        },
+        {
+          "text": "第一，中间的输入框。",
+          "state": {
+            "markers": null,
+            "focus": "#inputBox",
+            "label": "① 输入框",
+            "zoom": [
+              "#inputArea",
+              1.35
+            ]
+          }
+        },
+        {
+          "text": "上面写着“WorkBuddy，你的职场超能力”。",
+          "say": "上面写着，WorkBuddy，你的职场超能力。",
+          "state": {
+            "focus": "#hello",
+            "label": "欢迎语"
+          }
+        },
+        {
+          "text": "你要它做什么，直接打字在这里——",
+          "state": {
+            "focus": "#inputBox",
+            "label": "① 输入框 · 直接打字",
+            "type": {
+              "plain": "帮我把这周的会议记录整理成一份纪要"
+            },
+            "cursor": "#inputBox",
+            "click": true
+          }
+        },
+        {
+          "text": "这是你跟它说话的唯一入口。",
+          "state": {
+            "label": "① 唯一的对话入口"
+          }
+        },
+        {
+          "text": "第二，输入框下面的“选择工作空间”。",
+          "say": "第二，输入框下面的，选择工作空间。",
+          "state": {
+            "type": null,
+            "focus": "#wsBtn",
+            "label": "② 选择工作空间",
+            "zoom": [
+              "#inputArea",
+              1.35
+            ],
+            "cursor": "#wsBtn",
+            "click": null
+          }
+        },
+        {
+          "text": "这是新手最容易忽略、但最重要的按钮。",
+          "state": {
+            "label": "② 最容易忽略 · 最重要",
+            "click": true,
+            "menu": "workspace",
+            "focus": "#wsMenu"
+          }
+        },
+        {
+          "text": "它是在告诉 AI：你只能操作这个文件夹里的东西。",
+          "state": {
+            "menu": null,
+            "focus": null,
+            "label": null,
+            "click": null,
+            "cursor": null,
+            "zoom": null,
+            "diagram": "sandbox",
+            "diagStep": 1
+          }
+        },
+        {
+          "text": "比如你选了“下载”文件夹，它就只能动下载里的文件。",
+          "say": "比如你选了下载文件夹，它就只能动下载里的文件。",
+          "state": {
+            "diagStep": 2
+          }
+        },
+        {
+          "text": "为什么这么设计？安全。它碰不到你电脑上其他地方。",
+          "state": {
+            "diagStep": 3
+          }
+        },
+        {
+          "text": "但代价是：你忘了选，或者选错了，",
+          "state": {
+            "diagram": null,
+            "diagStep": null,
+            "focus": "#wsBtn",
+            "label": "忘了选 / 选错了",
+            "zoom": [
+              "#inputArea",
+              1.35
+            ]
+          }
+        },
+        {
+          "text": "它就会跟你说“找不到文件”。",
+          "say": "它就会跟你说，找不到文件。",
+          "state": {
+            "focus": "#toast",
+            "label": null,
+            "toast": "error",
+            "zoom": null
+          }
+        },
+        {
+          "text": "第三，右下角的模型选择。",
+          "state": {
+            "toast": null,
+            "focus": "#modelBtn",
+            "label": "③ 模型选择",
+            "zoom": [
+              "#inputArea",
+              1.35
+            ],
+            "cursor": "#modelBtn"
+          }
+        },
+        {
+          "text": "后面的数字是积分消耗倍数：数字越小越省，数字越大越聪明也越贵。",
+          "state": {
+            "click": true,
+            "menu": "model",
+            "focus": "#modelMenu",
+            "label": "倍数 = 积分消耗",
+            "zoom": [
+              "#modelMenu",
+              1.25
+            ],
+            "scale": true
+          }
+        },
+        {
+          "text": "日常任务用默认的 auto 就够了；",
+          "state": {
+            "focus": "#m-auto",
+            "label": "日常 → auto",
+            "scale": null
+          }
+        },
+        {
+          "text": "写长报告、跑数据分析这种复杂活，再换高倍率的，效果明显更好。",
+          "state": {
+            "focus": "#m-pro",
+            "label": "复杂活 → 高倍率"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sidebar",
+      "chapter": "三 · 左边功能区",
+      "base": {
+        "zoom": [
+          "#nav-project",
+          1.5
+        ]
+      },
+      "lines": [
+        {
+          "text": "左边功能区，快速过一遍，先混个脸熟。",
+          "state": {
+            "focus": "#sidebar",
+            "label": "功能区 · 混个脸熟"
+          }
+        },
+        {
+          "text": "“新建任务”，开一个新页面；",
+          "say": "新建任务，开一个新页面；",
+          "state": {
+            "focus": "#nav-new",
+            "label": "开一个新页面",
+            "cursor": "#nav-new"
+          }
+        },
+        {
+          "text": "“助理”，可以在手机上远程指挥家里电脑干活；",
+          "say": "助理，可以在手机上远程指挥家里电脑干活；",
+          "state": {
+            "focus": "#nav-assist",
+            "label": "手机远程指挥电脑",
+            "cursor": "#nav-assist",
+            "phone": true
+          }
+        },
+        {
+          "text": "“项目”，多人协作用的；",
+          "say": "项目，多人协作用的；",
+          "state": {
+            "focus": "#nav-project",
+            "label": "多人协作",
+            "cursor": "#nav-project",
+            "phone": null
+          }
+        },
+        {
+          "text": "“专家技能连接器”，管理技能和专家的地方，后面几期重点讲；",
+          "say": "专家技能连接器，管理技能和专家的地方，后面几期重点讲；",
+          "state": {
+            "focus": "#nav-skill",
+            "label": "管理技能和专家 · 后面几期重点讲",
+            "cursor": "#nav-skill"
+          }
+        },
+        {
+          "text": "“自动化”，定时任务，第三期主角；",
+          "say": "自动化，定时任务，第三期主角；",
+          "state": {
+            "focus": "#nav-auto",
+            "label": "定时任务 · 第 3 期主角",
+            "cursor": "#nav-auto"
+          }
+        },
+        {
+          "text": "“更多”里面是资料库和灵感模板。",
+          "say": "更多，里面是资料库和灵感模板。",
+          "state": {
+            "focus": "#moreMenu",
+            "label": "资料库 · 灵感模板",
+            "cursor": "#nav-more",
+            "click": true,
+            "menu": "more"
+          }
+        }
+      ]
+    },
+    {
+      "id": "extras",
+      "chapter": "四 · 其他常用入口",
+      "base": {},
+      "lines": [
+        {
+          "text": "输入框上面还有三种模式：日常办公、代码开发、设计创意，对应三类活。",
+          "state": {
+            "focus": "#modes",
+            "label": "三种模式",
+            "zoom": [
+              "#inputArea",
+              1.3
+            ],
+            "modeCycle": true
+          }
+        },
+        {
+          "text": "输入框旁边的加号，可以上传本地文件、腾讯文档，或者手动挂技能和连接器。",
+          "state": {
+            "modeCycle": null,
+            "focus": "#plusMenu",
+            "label": "加号：文件 / 文档 / 技能 / 连接器",
+            "cursor": "#plusBtn",
+            "click": true,
+            "menu": "plus"
+          }
+        },
+        {
+          "text": "左下角你的头像：每日签到领积分，",
+          "state": {
+            "zoom": [
+              "#avatar",
+              1.5
+            ],
+            "focus": "#avatarMenu",
+            "label": "每日签到领积分",
+            "cursor": "#avatar",
+            "click": true,
+            "menu": "avatar"
+          }
+        },
+        {
+          "text": "设置里能切换深色浅色。",
+          "state": {
+            "focus": "#themeRow",
+            "label": "深色 / 浅色",
+            "cursor": "#themeRow",
+            "theme": "dark"
+          }
+        },
+        {
+          "text": "下方任务列表会自动保存所有历史记录，做过什么随时回看。",
+          "state": {
+            "menu": null,
+            "click": null,
+            "theme": null,
+            "focus": "#history",
+            "label": "历史记录自动保存",
+            "cursor": "#history",
+            "zoom": [
+              "#history",
+              1.5
+            ]
+          }
+        },
+        {
+          "text": "这些今天不用背，用到哪期我讲到哪期。",
+          "state": {
+            "focus": null,
+            "label": null,
+            "cursor": null,
+            "zoom": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "four",
+      "chapter": "五 · 跑通第一个任务",
+      "base": {
+        "card": "four"
+      },
+      "lines": [
+        {
+          "text": "界面认完了，跑第一个任务。",
+          "state": {
+            "card": "chapter2"
+          }
+        },
+        {
+          "text": "关键在指令怎么写。记住四要素：目标、材料、格式、要求。",
+          "state": {
+            "card": "four",
+            "cardStep": 0
+          }
+        },
+        {
+          "text": "目标，你要它做什么；",
+          "state": {
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "材料，给它什么文件；",
+          "state": {
+            "cardStep": 2
+          }
+        },
+        {
+          "text": "格式，输出成什么样；",
+          "state": {
+            "cardStep": 3
+          }
+        },
+        {
+          "text": "要求，什么风格、什么规则。",
+          "state": {
+            "cardStep": 4
+          }
+        },
+        {
+          "text": "举个能直接抄的例子：",
+          "state": {
+            "card": null,
+            "focus": "#inputBox",
+            "label": "指令示例",
+            "zoom": [
+              "#inputArea",
+              1.3
+            ]
+          }
+        },
+        {
+          "text": "“帮我把这份成绩单整理成 Excel”——目标 + 材料，",
+          "say": "帮我把这份成绩单整理成 Excel。",
+          "state": {
+            "type": {
+              "rich": "example",
+              "upto": 1
+            }
+          }
+        },
+        {
+          "text": "“筛选出不及格的学生、标注成绩区间”——格式，",
+          "say": "筛选出不及格的学生、标注成绩区间。",
+          "state": {
+            "type": {
+              "rich": "example",
+              "upto": 2
+            }
+          }
+        },
+        {
+          "text": "“最后加一行全班的平均分”——要求。",
+          "say": "最后加一行全班的平均分。",
+          "state": {
+            "type": {
+              "rich": "example",
+              "upto": 3
+            }
+          }
+        },
+        {
+          "text": "四个要素齐了，它一次就能做对。",
+          "state": {
+            "type": {
+              "rich": "example",
+              "upto": 3
+            },
+            "tags": true,
+            "focus": "#inputArea",
+            "label": "四要素齐全 ✓",
+            "zoom": [
+              "#inputArea",
+              1.2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "chapter": "五 · 跑通第一个任务",
+      "base": {
+        "type": {
+          "rich": "example",
+          "upto": 3,
+          "done": true
+        },
+        "zoom": [
+          "#inputArea",
+          1.25
+        ]
+      },
+      "lines": [
+        {
+          "text": "然后配置任务：",
+          "state": {}
+        },
+        {
+          "text": "选一个工作空间——建议新手专门建一个叫“入门跟练”的文件夹练手，",
+          "say": "选一个工作空间，建议新手专门建一个叫入门跟练的文件夹练手，",
+          "state": {
+            "cursor": "#wsBtn",
+            "click": true,
+            "menu": "workspace",
+            "wsPick": true,
+            "focus": "#wsMenu",
+            "label": "新建「入门跟练」",
+            "zoom": [
+              "#wsMenu",
+              1.25
+            ]
+          }
+        },
+        {
+          "text": "文件放进去，或者用加号上传；",
+          "state": {
+            "ws": "入门跟练",
+            "cursor": "#plusBtn",
+            "menu": "plus",
+            "focus": "#plusMenu",
+            "label": "上传：成绩单.xlsx",
+            "attach": true,
+            "zoom": [
+              "#plusMenu",
+              1.25
+            ]
+          }
+        },
+        {
+          "text": "模式用默认，点“发送任务”。",
+          "say": "模式用默认，点发送任务。",
+          "state": {
+            "menu": null,
+            "focus": "#sendBtn",
+            "label": "发送任务",
+            "cursor": "#sendBtn",
+            "zoom": [
+              "#inputArea",
+              1.25
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "run",
+      "chapter": "六 · 执行与结果",
+      "base": {
+        "view": "chat",
+        "ws": "入门跟练"
+      },
+      "lines": [
+        {
+          "text": "执行的时候你会看到什么？",
+          "state": {
+            "chat": 0
+          }
+        },
+        {
+          "text": "它会实时显示“正在思考、正在读取、正在处理”，",
+          "say": "它会实时显示，正在思考、正在读取、正在处理，",
+          "state": {
+            "chat": 1,
+            "focus": "#steps",
+            "label": "实时进度",
+            "zoom": [
+              "#steps",
+              1.4
+            ]
+          }
+        },
+        {
+          "text": "右边有个概览窗口预览结果，",
+          "state": {
+            "chat": 2,
+            "preview": true,
+            "focus": "#preview",
+            "label": "概览窗口 · 预览结果",
+            "zoom": [
+              "#preview",
+              1.25
+            ]
+          }
+        },
+        {
+          "text": "生成的文件都存在你选的工作空间里。",
+          "state": {
+            "chat": 2,
+            "preview": true,
+            "files": true,
+            "focus": "#fileTree",
+            "label": "保存在「入门跟练」",
+            "zoom": [
+              "#fileTree",
+              1.4
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "revise",
+      "chapter": "七 · 不满意就改",
+      "base": {
+        "view": "chat",
+        "ws": "入门跟练",
+        "chat": 2,
+        "preview": true
+      },
+      "lines": [
+        {
+          "text": "做完不满意怎么办？",
+          "state": {}
+        },
+        {
+          "text": "直接在对话框里提修改意见，比如“把不及格的标准改成低于 60 分”，它重新生成。",
+          "say": "直接在对话框里提修改意见，比如，把不及格的标准改成低于六十分，它重新生成。",
+          "state": {
+            "focus": "#chatInput",
+            "label": "直接提修改意见",
+            "reviseType": true,
+            "cursor": "#chatInput",
+            "zoom": [
+              "#chatInput",
+              1.4
+            ]
+          }
+        },
+        {
+          "text": "注意：修改会覆盖原文件，某一版特别满意的话，先自己备份一份。",
+          "state": {
+            "reviseType": null,
+            "chat": 3,
+            "rev": 2,
+            "warn": true,
+            "focus": "#warn",
+            "label": "⚠ 会覆盖原文件",
+            "cursor": null,
+            "zoom": [
+              "#previewIn",
+              1.25
+            ]
+          }
+        },
+        {
+          "text": "另外所有任务记录永久保存，哪天想翻当时的结果，历史里都能找到。",
+          "state": {
+            "chat": 3,
+            "rev": 2,
+            "warn": null,
+            "focus": "#history",
+            "label": "历史记录永久保存",
+            "cursor": "#history",
+            "zoom": [
+              "#history",
+              1.5
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "chapter": "收尾口诀",
+      "base": {
+        "card": "summary"
+      },
+      "lines": [
+        {
+          "text": "界面记住“三看”：输入框、工作空间、模型倍数，剩下的用到再说；",
+          "say": "界面记住三看：输入框、工作空间、模型倍数，剩下的用到再说；",
+          "state": {
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "指令记住四要素：目标、材料、格式、要求。",
+          "state": {
+            "cardStep": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "outro",
+      "chapter": "避坑 · 预告",
+      "base": {
+        "card": "pits"
+      },
+      "lines": [
+        {
+          "text": "两个坑：一是第一次用先确认工作空间，不然它永远“找不到文件”；",
+          "say": "两个坑：一是第一次用先确认工作空间，不然它永远找不到文件；",
+          "state": {
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "二是提修改会覆盖原文件，重要的先备份。",
+          "state": {
+            "cardStep": 2
+          }
+        },
+        {
+          "text": "下期讲新手最懵的问题：Skill 到底是什么、怎么挑、怎么装、怎么用。",
+          "state": {
+            "card": "next",
+            "cardStep": 1
+          }
+        },
+        {
+          "text": "想跟着做，评论区扣个“教程”，我把界面速查图和指令模板发给你。",
+          "say": "想跟着做，评论区扣个教程，我把界面速查图和指令模板发给你。",
+          "state": {
+            "card": "cta",
+            "cardStep": 1
+          }
+        }
+      ]
+    }
+  ]
+}
