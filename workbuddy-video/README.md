@@ -1,5 +1,7 @@
 # WorkBuddy 从零到一 · 第 1 期（知识讲解视频）
 
+> 要复用这套模板做新视频？请先读 [AGENT_GUIDE.md](AGENT_GUIDE.md)（完整制作手册，含脚本规范、原理、流程和检查清单）。
+
 口播稿 → 配音 + 动态界面演示 + 字幕 → 1920×1080 MP4，全部由代码生成，可重复构建。
 
 ## 产出
@@ -32,7 +34,7 @@ node render.mjs --from 30 --to 60     # 只渲染一段
 node render.mjs                       # 渲染整片 → build/workbuddy-ep01.mp4
 ```
 
-只改画面（`state`）不改台词时，不必重新合成配音，把 `scenes.json` 里的 state 同步进 `build/timeline.json` 即可；改台词需重跑 `tts.py`。
+只改画面（`state`）不改台词时，不必重新合成配音，运行 `python3 tools/sync_states.py` 即可；改台词需重跑 `tts.py`。检查画面可用 `python3 tools/contact_sheet.py 秒数...` 把截图拼成总览。
 
 ## 注意
 

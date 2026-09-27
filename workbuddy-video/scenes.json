@@ -245,16 +245,14 @@
             "zoom": [
               "#modelMenu",
               1.25
-            ],
-            "scale": true
+            ]
           }
         },
         {
           "text": "日常任务用默认的 auto 就够了；",
           "state": {
             "focus": "#m-auto",
-            "label": "日常 → auto",
-            "scale": null
+            "label": "日常 → auto"
           }
         },
         {
