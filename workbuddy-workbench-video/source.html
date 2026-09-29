@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>WorkBuddy 工作台教程</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/900.css">
+<style>
+:root{
+  --ink:#1d2033; --ink2:#5a5f7a; --ink3:#9a9fb8; --line:#e4e6f0;
+  --brand:#5b5bf6; --brand2:#8b5cf6; --brandSoft:#eeeefe; --ok:#16a36a; --okSoft:#e6f7ef;
+  --warn:#e8590c; --warnSoft:#fff1e7; --bad:#e03131; --badSoft:#ffecec; --gold:#ffb700;
+  --mint:#3ef0b5; --cyan:#4cc9ff; --neon:#a78bfa;
+  --k1:#ff6b9d; --k2:#ffb347; --k3:#3ef0b5; --k4:#4cc9ff; --k5:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#070916}
+body{font-family:'Noto Sans SC','WenQuanYi Zen Hei',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden;background:radial-gradient(1400px 800px at 50% 40%,#1a1f4a 0%,#0b0e24 55%,#05060f 100%);perspective:2000px;perspective-origin:50% 45%}
+#floor{position:absolute;left:-1600px;right:-1600px;top:600px;height:1900px;transform-origin:50% 0;transform:rotateX(80deg);
+  background-image:linear-gradient(rgba(62,240,181,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(76,201,255,.3) 2px,transparent 2px);background-size:140px 140px;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.95),transparent 70%);mask-image:linear-gradient(180deg,rgba(0,0,0,.95),transparent 70%)}
+#horizon{position:absolute;left:0;right:0;top:590px;height:6px;background:linear-gradient(90deg,transparent,rgba(62,240,181,.9),rgba(167,139,250,.9),transparent);filter:blur(3px)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.45}
+.star{position:absolute;left:0;top:0;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(174,238,255,0),#dff6ff);transform-origin:100% 50%}
+#world{position:absolute;inset:0;transform-style:preserve-3d}
+.scene{position:absolute;inset:0;opacity:0;transform-style:preserve-3d}
+.flat{transform-style:flat!important;perspective:2000px}
+.ph3 .back,.ph3 .edge{display:none}
+.ph3 .body{box-shadow:0 0 0 2px rgba(255,255,255,.14),6px 8px 0 #2a2f55,0 40px 80px rgba(0,0,0,.5)}
+.abs{position:absolute}.center{display:flex;align-items:center;justify-content:center}
+.p3{transform-style:preserve-3d}
+#badge{position:absolute;left:36px;top:26px;z-index:40;display:flex;gap:12px;align-items:center;background:rgba(20,24,56,.75);border:1px solid rgba(255,255,255,.12);padding:8px 14px 8px 8px;border-radius:18px;backdrop-filter:blur(6px)}
+#badge .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--mint),var(--cyan) 50%,var(--neon));color:#0b0e24;font-weight:900;font-size:22px}
+#badge .t{font-size:22px;font-weight:700;color:#fff}
+#badge .c{font-size:19px;color:var(--mint);border:1px solid rgba(62,240,181,.4);padding:5px 14px;border-radius:99px;font-weight:500}
+#progress{position:absolute;left:0;top:0;height:5px;background:linear-gradient(90deg,var(--mint),var(--cyan),var(--neon));z-index:60;box-shadow:0 0 12px var(--mint)}
+#cursor{position:absolute;z-index:45;width:40px;height:40px;left:0;top:0;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+#ripple{position:absolute;z-index:44;width:80px;height:80px;border-radius:50%;border:4px solid var(--mint);opacity:0}
+
+.h1{font-size:92px;font-weight:900;color:#fff;letter-spacing:2px}
+.h2{font-size:66px;font-weight:900;color:#fff;text-shadow:0 0 30px rgba(76,201,255,.35)}
+.neon{background:linear-gradient(90deg,var(--mint),var(--cyan),var(--neon));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:34px;color:#b9c0e8}
+.panel{background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08)}
+.glass{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:24px;backdrop-filter:blur(8px);color:#fff;box-shadow:0 30px 80px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15)}
+.rim{box-shadow:0 0 0 2px rgba(62,240,181,.8),0 0 40px rgba(62,240,181,.45),0 30px 80px rgba(0,0,0,.45)!important}
+.tag{display:inline-block;padding:6px 16px;border-radius:10px;font-weight:700;font-size:24px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-weight:700;font-size:16px}
+
+/* app window */
+.win{position:absolute;left:150px;top:112px;width:1620px;height:800px;background:#fff;border-radius:18px;box-shadow:0 60px 140px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1),0 0 80px rgba(76,201,255,.18);overflow:hidden}
+.win .bar{height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:10px;background:#fafbfe}
+.win .dot{width:14px;height:14px;border-radius:50%}
+.win .ttl{margin-left:18px;font-size:18px;font-weight:700}
+.side{position:absolute;left:0;top:52px;bottom:0;width:230px;background:#f8f9fd;border-right:1px solid var(--line);padding:18px 14px}
+.side .it{display:flex;align-items:center;gap:12px;font-size:18px;color:var(--ink2);padding:12px 14px;border-radius:10px;margin-bottom:4px}
+.side .it.on{background:var(--brandSoft);color:var(--brand);font-weight:700}
+.main{position:absolute;left:230px;top:52px;right:0;bottom:0}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;font-size:17px;font-weight:500;padding:9px 18px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.glow{box-shadow:0 0 0 4px var(--gold),0 0 40px rgba(255,183,0,.55)!important}
+.fold{width:190px;height:150px;border-radius:16px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:17px;background:#fff;position:relative}
+.fold .i{font-size:56px}
+.menu{position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px rgba(30,30,80,.25);padding:6px;width:220px;opacity:0;z-index:5}
+.menu div{padding:10px 12px;border-radius:8px;font-size:16px}
+.menu div.on{background:var(--brandSoft);color:var(--brand);font-weight:700}
+.bub{max-width:980px;font-size:19px;line-height:1.7;padding:14px 20px;border-radius:16px}
+.bub.me{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.bub.ai{align-self:flex-start;background:#f4f5fa;border:1px solid var(--line);border-bottom-left-radius:4px}
+.inp{position:absolute;left:50px;right:50px;bottom:26px;border:2px solid var(--line);border-radius:16px;min-height:78px;padding:18px 70px 18px 22px;font-size:21px;line-height:1.7;background:#fff}
+.inp.focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,246,.12)}
+.inp .send{position:absolute;right:14px;bottom:14px;width:46px;height:46px;border-radius:12px;background:var(--brand);color:#fff;font-size:22px}
+.ph{color:var(--ink3)}
+.caret{display:inline-block;width:2px;height:22px;background:var(--brand);vertical-align:middle;margin-left:1px}
+.s-人{background:rgba(255,107,157,.2);box-shadow:0 -3px 0 var(--k1) inset}.s-块{background:rgba(255,179,71,.22);box-shadow:0 -3px 0 var(--k2) inset}
+.s-样{background:rgba(62,240,181,.25);box-shadow:0 -3px 0 #12b886 inset}.s-屏{background:rgba(76,201,255,.22);box-shadow:0 -3px 0 #1c9bd6 inset}
+.s-存{background:rgba(167,139,250,.25);box-shadow:0 -3px 0 var(--k5) inset}
+.step{display:flex;align-items:center;gap:12px;font-size:18px;padding:6px 0}
+.sp{width:18px;height:18px;border-radius:50%;border:3px solid #d9dafc;border-top-color:var(--brand);display:inline-block}
+
+/* phone 3D */
+.ph3{position:absolute;width:300px;height:620px;transform-style:preserve-3d}
+.ph3 .back{position:absolute;inset:0;border-radius:46px;background:linear-gradient(135deg,#2a2f55,#11142b);transform:translateZ(-16px)}
+.ph3 .edge{position:absolute;inset:2px;border-radius:44px;background:#3a3f6a;transform:translateZ(-8px)}
+.ph3 .body{position:absolute;inset:0;border-radius:46px;background:#15182e;padding:12px;box-shadow:0 0 0 2px rgba(255,255,255,.12),0 40px 80px rgba(0,0,0,.5)}
+.ph3 .scr{width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;background:#fff}
+.ph3 .notch{position:absolute;left:50%;top:10px;width:90px;height:24px;margin-left:-45px;border-radius:14px;background:#15182e;z-index:9}
+
+/* generated app */
+.app{position:absolute;inset:0;padding:44px 14px 14px;background:linear-gradient(165deg,#A8E6CF 0%,#DCEDC1 55%,#f7fff9 100%);font-size:13px;color:#1f3b33}
+.app .hi{font-size:13px;color:#2f6b58}.app .tt{font-size:25px;font-weight:900;margin-top:2px}
+.acard{background:#fff;border-radius:18px;padding:12px 14px;margin-top:10px;box-shadow:0 6px 18px rgba(31,59,51,.08)}
+.acard .h{font-size:17px;font-weight:900;display:flex;align-items:center;gap:6px}
+.acard .row{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:14px}
+.acard .cb{width:16px;height:16px;border-radius:5px;border:2px solid #7fcfb0;flex:none}
+.acard .cb.on{background:#38b889;border-color:#38b889}
+.acard .bar{height:8px;border-radius:9px;background:#e3f5ec;margin-top:8px;overflow:hidden}
+.acard .bar i{display:block;height:100%;background:linear-gradient(90deg,#38b889,#7ee0b8);border-radius:9px}
+.app.rough{background:#cfe9dd;font-size:11px}
+.app.rough .tt{font-size:18px}.app.rough .acard{border-radius:4px;box-shadow:none;border:1px solid #bbb;padding:8px}
+.app.rough .acard .h{font-size:13px;font-weight:700}.app.rough .ic{display:none}
+.app.rough .acard .row{font-size:11px}
+.toast{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);background:#1f3b33;color:#fff;border-radius:99px;padding:8px 16px;font-size:13px;white-space:nowrap;opacity:0}
+.desk{position:absolute;left:0;top:0;width:1000px;height:640px;background:linear-gradient(165deg,#A8E6CF,#DCEDC1 60%,#fff);padding:30px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;transform-origin:0 0;font-size:18px;color:#1f3b33}
+.desk .dc{background:#fff;border-radius:18px;padding:20px;box-shadow:0 6px 18px rgba(31,59,51,.08)}
+.desk .dh{grid-column:span 3;font-size:34px;font-weight:900}
+.code{font-family:'DejaVu Sans Mono',monospace;font-size:14px;line-height:1.6;color:#c6d0ff;white-space:pre}
+.faq{position:relative;height:270px;transform-style:preserve-3d}
+.faq .f{position:absolute;inset:0;border-radius:22px;padding:26px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.faq .fa{background:rgba(255,80,110,.12);border:2px solid rgba(255,107,157,.6);color:#fff}
+.faq .fb{background:#fff;transform:rotateY(180deg);border:3px solid var(--mint)}
+.co{position:absolute;z-index:30;opacity:0;border-radius:18px;padding:18px 24px;font-size:23px;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="orb" id="orb1" style="width:800px;height:800px;background:#3a2fb0;left:-250px;top:-300px"></div>
+  <div class="orb" id="orb2" style="width:700px;height:700px;background:#0f7a6a;right:-200px;top:250px"></div>
+  <div class="orb" id="orb3" style="width:600px;height:600px;background:#6a2a8a;left:650px;top:750px"></div>
+  <div id="floor"></div><div id="horizon"></div>
+  <div id="stars"></div>
+  <div id="progress"></div>
+  <div id="badge"><div class="logo center">W</div><div class="t">WorkBuddy 从零到一</div><div class="c" id="chapter">第 4 期 · 搭工作台</div></div>
+<div id="world">
+
+  <!-- intro -->
+  <div class="scene" id="s-intro">
+    <div class="abs center p3" style="inset:0;flex-direction:column;gap:30px;padding-bottom:80px">
+      <div id="in-pill" class="glass" style="padding:10px 28px;border-radius:99px;font-size:26px">新手系列 · 第 4 期</div>
+      <div class="h1" id="in-t1">从零到一，带你把 <span class="neon">WorkBuddy</span> 学会</div>
+      <div id="in-t2" class="sub">一期讲透一个功能，每一步都带着你做</div>
+      <div id="in-t3" class="glass center" style="margin-top:20px;padding:22px 46px;gap:18px;font-size:46px;font-weight:900"><span style="font-size:54px">📱</span>本期：<span class="neon">搭一个自己的工作台</span></div>
+    </div>
+  </div>
+
+  <!-- hook -->
+  <div class="scene flat" id="s-hook">
+    <div class="abs center" id="hk-q" style="left:0;right:0;top:130px;flex-direction:column;gap:10px"><div class="h2" id="hk-qt">你手机上有没有一个 APP，是<span class="neon">自己搭的</span>？</div></div>
+    <div class="abs p3" id="hk-orbit" style="left:960px;top:590px;width:0;height:0"></div>
+    <div class="ph3" id="hk-ph" style="left:810px;top:300px"><div class="back"></div><div class="edge"></div><div class="body"><div class="scr"><div class="notch"></div><div id="hk-scr" class="abs" style="inset:0"></div></div></div></div>
+    <div class="abs" id="hk-l" style="left:190px;top:360px;width:520px"></div>
+    <div class="abs" id="hk-r" style="left:1220px;top:360px;width:520px"></div>
+  </div>
+
+  <!-- three choices -->
+  <div class="scene" id="s-three">
+    <div class="abs center" style="left:0;right:0;top:150px;flex-direction:column;gap:14px"><div class="h2">动手前，先做 <span class="neon">三个选择</span></div><div class="sub" id="th-s">能省一大半返工</div></div>
+    <div class="abs p3" id="th-row" style="left:0;right:0;top:360px;height:440px"></div>
+  </div>
+
+  <!-- APP window -->
+  <div class="scene flat" id="s-app">
+    <div class="win" id="win">
+      <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div class="ttl">WorkBuddy</div><div id="wd" style="margin-left:24px;font-size:15px;color:var(--ink3)">工作目录：未设置</div>
+        <div style="margin-left:auto" class="center"><div class="center" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffd6a5,#fdffb6);font-size:18px">🙂</div></div></div>
+      <div class="side"><div class="it" id="nv-chat"><span>💬</span>新对话</div><div class="it"><span>🧩</span>技能市场</div><div class="it"><span>⚙️</span>自动化</div><div class="it" id="nv-file"><span>📁</span>我的文件</div></div>
+      <div class="main">
+        <div id="v-file" class="abs" style="inset:0;padding:26px 40px">
+          <div style="display:flex;align-items:center"><div style="font-size:30px;font-weight:900">我的文件</div><div class="btn pri" id="btn-nf" style="margin-left:auto">＋ 新建文件夹</div></div>
+          <div id="fgrid" style="display:flex;gap:22px;margin-top:28px;flex-wrap:wrap">
+            <div class="fold"><div class="i">📁</div>周报</div><div class="fold"><div class="i">📁</div>AI热点</div><div class="fold"><div class="i">📁</div>素材</div>
+            <div class="fold" id="fd-new" style="opacity:0"><div class="i">📁</div><div id="fd-name"></div><div id="fd-pin" style="position:absolute;top:10px;right:10px;font-size:13px;background:var(--okSoft);color:var(--ok);padding:2px 8px;border-radius:6px;font-weight:700;opacity:0">📌 工作目录</div></div>
+          </div>
+          <div class="menu" id="menu"><div>打开</div><div>重命名</div><div id="mn-set">📌 设为工作目录</div><div>删除</div></div>
+        </div>
+        <div id="v-chat" class="abs" style="inset:0;opacity:0">
+          <div id="msgs" class="abs" style="left:50px;right:50px;top:26px;bottom:150px;display:flex;flex-direction:column;gap:18px;justify-content:flex-end;overflow:hidden"></div>
+          <div class="inp" id="inp"><span id="inp-t"></span><div class="send center">➤</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="co glass" id="co1" style="left:1240px;top:640px;width:560px"></div>
+    <div class="co glass" id="co2" style="left:120px;top:650px;width:1680px;padding:14px 20px"></div>
+  </div>
+
+  <!-- modules -->
+  <div class="scene" id="s-mod">
+    <div class="abs center" style="left:0;right:0;top:140px;flex-direction:column;gap:12px"><div class="h2">第二，要 <span class="neon">哪几个模块</span></div><div class="sub" id="md-s">建议 5～6 个就够</div></div>
+    <div class="abs p3" id="md-stage" style="left:960px;top:640px;width:0;height:0"></div>
+    <div class="abs glass" id="md-meter" style="left:1400px;top:330px;width:380px;padding:22px 26px;opacity:0">
+      <div style="font-size:20px;color:#b9c0e8">生成耗时</div><div id="md-time" style="font-size:44px;font-weight:900">2 分钟</div>
+      <div style="font-size:20px;color:#b9c0e8;margin-top:10px">出错概率</div><div style="height:14px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:8px;overflow:hidden"><i id="md-err" style="display:block;height:100%;width:10%;background:linear-gradient(90deg,#3ef0b5,#ff6b6b)"></i></div>
+    </div>
+  </div>
+
+  <!-- screens -->
+  <div class="scene flat" id="s-scr">
+    <div class="abs center" style="left:0;right:0;top:130px;flex-direction:column;gap:14px"><div class="h2">第三，想清楚 <span class="neon">在哪用</span></div></div>
+    <div class="abs p3" id="sc-mon" style="left:170px;top:300px;width:900px;height:620px">
+      <div style="width:900px;height:560px;border-radius:22px;background:#15182e;padding:14px;box-shadow:0 40px 90px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.1)"><div style="width:100%;height:100%;border-radius:12px;overflow:hidden;position:relative" id="sc-mon-scr"></div></div>
+      <div style="width:160px;height:60px;margin:0 auto;background:linear-gradient(#2a2f55,#15182e)"></div>
+      <div id="sc-mon-ok" class="tag" style="position:absolute;right:20px;top:-60px;background:rgba(62,240,181,.18);color:var(--mint)">电脑上：很好看 ✓</div>
+    </div>
+    <div class="ph3" id="sc-ph" style="left:1300px;top:290px"><div class="back"></div><div class="edge"></div><div class="body"><div class="scr"><div class="notch"></div><div id="sc-ph-scr" class="abs" style="inset:0;overflow:hidden"></div></div></div></div>
+    <div class="abs" id="sc-ph-tag" style="left:1260px;top:230px;width:400px;text-align:center"></div>
+    <div class="abs center" id="sc-key" style="left:0;right:0;top:230px;opacity:0"><div class="glass" style="padding:14px 30px;font-size:34px;font-weight:900">提示词开头加：<span style="color:var(--mint)">「手机优先」</span></div></div>
+  </div>
+
+  <!-- formula -->
+  <div class="scene" id="s-form">
+    <div class="abs center" style="left:0;right:0;top:130px;flex-direction:column;gap:12px"><div class="h2">提示词五件事 · 口诀</div></div>
+    <div class="abs p3" id="fm-row" style="left:130px;right:130px;top:290px;height:560px;display:flex;gap:26px"></div>
+  </div>
+
+  <!-- build (exploded) -->
+  <div class="scene flat" id="s-build">
+    <div class="abs center" style="left:0;right:0;top:120px;flex-direction:column;gap:10px"><div class="h2" id="bd-t">发出去之后，等几分钟</div></div>
+    <div class="abs p3" id="bd-ph" style="left:760px;top:300px;width:300px;height:620px"></div>
+    <div class="abs" id="bd-steps" style="left:170px;top:360px;width:470px"></div>
+    <div class="abs p3" id="bd-files" style="left:1260px;top:330px;width:520px;height:560px"></div>
+    <div class="abs glass center" id="bd-clock" style="left:170px;top:760px;width:470px;height:90px;font-size:28px;font-weight:700;opacity:0"></div>
+  </div>
+
+  <!-- first version + rounds -->
+  <div class="scene flat" id="s-iter">
+    <div class="abs center" style="left:0;right:0;top:120px"><div class="h2" id="it-t">初版出来，别急着嫌弃</div></div>
+    <div class="ph3" id="it-ph" style="left:810px;top:290px"><div class="back"></div><div class="edge"></div><div class="body"><div class="scr"><div class="notch"></div><div id="it-scr" class="abs" style="inset:0"></div></div></div></div>
+    <div class="abs" id="it-rounds" style="left:150px;top:330px;width:560px"></div>
+    <div class="abs" id="it-side" style="left:1230px;top:330px;width:540px"></div>
+  </div>
+
+  <!-- install -->
+  <div class="scene flat" id="s-inst">
+    <div class="abs center" style="left:0;right:0;top:110px"><div class="h2" id="is-t">用手机浏览器打开链接</div></div>
+    <div class="ph3" id="is-a" style="left:420px;top:290px"><div class="back"></div><div class="edge"></div><div class="body"><div class="scr"><div class="notch"></div><div id="is-a-scr" class="abs" style="inset:0"></div></div></div></div>
+    <div class="ph3" id="is-b" style="left:1200px;top:290px"><div class="back"></div><div class="edge"></div><div class="body"><div class="scr"><div class="notch"></div><div id="is-b-scr" class="abs" style="inset:0"></div></div></div></div>
+    <div class="abs center" id="is-la" style="left:320px;top:930px;width:500px;font-size:28px;font-weight:900;color:#fff">🍎 苹果 · 分享 → 添加到主屏幕</div>
+    <div class="abs center" id="is-lb" style="left:1100px;top:930px;width:500px;font-size:28px;font-weight:900;color:#fff">🤖 安卓 · ⋮ → 安装应用</div>
+  </div>
+
+  <!-- faq -->
+  <div class="scene" id="s-faq">
+    <div class="abs center" style="left:0;right:0;top:110px"><div class="h2">六个常见问题 · <span class="neon">对号入座</span></div></div>
+    <div class="abs p3" id="fq-grid" style="left:130px;right:130px;top:250px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px"></div>
+  </div>
+
+  <!-- magic -->
+  <div class="scene" id="s-magic">
+    <div class="abs center" style="left:0;right:0;top:140px"><div class="h2" id="mg-t">像「变魔术」的一期</div></div>
+    <div class="abs center p3" id="mg-eq" style="left:0;right:0;top:350px;gap:40px">
+      <div class="glass center" id="mg-a" style="width:470px;height:320px;flex-direction:column;gap:14px"><div style="font-size:26px;color:#b9c0e8">五要素提示词</div><div style="font-size:64px;font-weight:900;letter-spacing:10px" class="neon">人块样屏存</div></div>
+      <div id="mg-p" style="font-size:90px;color:#fff;font-weight:900">+</div>
+      <div class="glass center" id="mg-b" style="width:470px;height:320px;flex-direction:column;gap:14px"><div style="font-size:26px;color:#b9c0e8">三轮迭代</div><div style="font-size:52px;font-weight:900" class="neon">结构 → 细节 → 功能</div></div>
+      <div id="mg-e" style="font-size:90px;color:#fff;font-weight:900">=</div>
+      <div class="center" id="mg-c" style="width:220px;height:320px;font-size:150px">🪄</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div class="scene" id="s-next">
+    <div class="abs glass" id="nx-card" style="left:180px;top:180px;width:1560px;height:330px;padding:44px 56px;display:flex;align-items:center;gap:44px">
+      <div class="center" style="width:210px;height:210px;border-radius:44px;background:linear-gradient(135deg,var(--mint),var(--cyan),var(--neon));font-size:110px;flex:none;box-shadow:0 0 60px rgba(76,201,255,.5)">🎓</div>
+      <div><div style="font-size:26px;color:var(--mint);font-weight:700">下期预告 · 高含金量功能</div><div style="font-size:74px;font-weight:900;margin-top:6px">专家</div><div style="font-size:34px;color:#b9c0e8;margin-top:8px">为什么你的 AI 回答，总不落地？</div></div>
+    </div>
+    <div class="abs panel" id="nx-cmt" style="left:180px;top:560px;width:1560px;height:300px;padding:34px 50px;opacity:0">
+      <div style="font-size:24px;font-weight:700;color:var(--ink2)">💬 评论区</div>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:22px"><div class="center" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#a5d8ff,#d0bfff);font-size:28px">🙋</div>
+        <div id="nx-in" style="flex:1;height:70px;border:2px solid var(--brand);border-radius:14px;padding:0 22px;display:flex;align-items:center;font-size:30px"></div><div class="btn pri" style="font-size:22px;padding:14px 28px">发送</div></div>
+      <div id="nx-reply" style="margin-top:22px;font-size:24px;color:var(--ok);font-weight:700;opacity:0">📩 已私信你：工作台完整提示词模板 · 改三个词就能用</div>
+    </div>
+  </div>
+</div>
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22.5 L15.5 21 L12 14 L19 14 Z" fill="#fff" stroke="#111" stroke-width="1.5" stroke-linejoin="round"/></svg>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eout=x=>1-Math.pow(1-x,3);
+const eback=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
+const prog=(t,a,d=.5)=>clamp((t-a)/d);const lerp=(a,b,p)=>a+(b-a)*p;
+function in3d(el,t,a,d=.6,o={}){const p=clamp((t-a)/d);const e=eback(p);const z=o.z??-600,ry=o.ry??0,rx=o.rx??20,y=o.y??60;
+  el.style.opacity=clamp(p*1.8);el.style.transform=`translate3d(0,${(1-e)*y}px,${(1-e)*z}px) rotateX(${(1-e)*rx}deg) rotateY(${(1-e)*ry}deg)`+(o.extra||'');return p;}
+const typed=(s,t,a,cps=12)=>[...s].slice(0,Math.floor(Math.max(0,t-a)*cps)).join('');
+const caret=t=>(Math.floor(t*2)%2===0)?'<span class="caret"></span>':'<span class="caret" style="opacity:0"></span>';
+window.MISSING=new Set();
+function rectOf(sel){const e=typeof sel==='string'?$(sel):sel;if(!e){MISSING.add(sel);return{left:960,top:540,width:0,height:0};}return e.getBoundingClientRect();}
+function centerOf(sel,dx=0,dy=0){const r=rectOf(sel);return[r.left+r.width/2+dx,r.top+r.height/2+dy];}
+let cursorState=null;
+function cursorPath(t,kf){const pts=kf.map(k=>{const p=typeof k[1]==='string'?centerOf(k[1],k[3]||0,k[4]||0):k[1];return{t:k[0],x:p[0],y:p[1],c:k[2]};});
+  let x=pts[0].x,y=pts[0].y;for(let i=0;i<pts.length;i++){if(t>=pts[i].t){x=pts[i].x;y=pts[i].y;}
+    if(i<pts.length-1&&t>=pts[i].t&&t<pts[i+1].t){const mv=Math.min(.6,pts[i+1].t-pts[i].t),s=pts[i+1].t-mv;if(t>=s){const p=ease((t-s)/mv);x=lerp(pts[i].x,pts[i+1].x,p);y=lerp(pts[i].y,pts[i+1].y,p);}}}
+  let click=null;for(const p of pts)if(p.c&&t>=p.t&&t<p.t+.4)click={x:p.x,y:p.y,p:(t-p.t)/.4};cursorState={x,y,click};}
+const WIN={l:150,t:112};
+function localCenter(sel){const win=$('#win');let e=$(sel);if(!e){MISSING.add(sel);return[810,400];}let x=e.offsetWidth/2,y=e.offsetHeight/2;while(e&&e!==win){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent;}return[x,y];}
+function camera(t,kf,gt){const P=kf.map(k=>{const c=k[1]?localCenter(k[1]):[810,400];return{t:k[0],fx:c[0],fy:c[1],s:k[2]??1,rx:k[3]??0,ry:k[4]??0,sx:k[5]??960,sy:k[6]??(k[1]?520:512)};});
+  let cur={...P[0]};for(let i=0;i<P.length;i++){if(t>=P[i].t)cur={...P[i]};if(i<P.length-1&&t>=P[i].t&&t<P[i+1].t){const mv=Math.min(.9,P[i+1].t-P[i].t),s=P[i+1].t-mv;
+    if(t>=s){const p=ease((t-s)/mv);for(const k of['fx','fy','s','rx','ry','sx','sy'])cur[k]=lerp(P[i][k],P[i+1][k],p);}}}
+  const w=$('#win');w.style.transformOrigin=`${cur.fx}px ${cur.fy}px`;
+  w.style.transform=`translate(${cur.sx-(WIN.l+cur.fx)}px,${cur.sy-(WIN.t+cur.fy)}px) perspective(2200px) rotateX(${cur.rx+Math.cos(gt*.4)*.8}deg) rotateY(${cur.ry+Math.sin(gt*.5)*1.4}deg) scale(${cur.s})`;}
+function coShow(id,t,a,b,html,o={}){const e=$(id);if(t<a||t>=b){e.style.opacity=0;return;}if(html!==undefined)e.innerHTML=html;
+  const p=eout(prog(t,a,.45)),q=1-prog(t,b-.3,.3);e.style.opacity=p*q;
+  e.style.transform=`perspective(1200px) translate3d(${(1-p)*(o.dx??80)}px,${(1-p)*(o.dy??0)}px,${(1-p)*-300}px) rotateY(${(1-p)*(o.ry??-25)+(o.ry0??-6)}deg)`;}
+function phoneT(el,t,o){el.style.transform=`perspective(1600px) translate3d(${o.x||0}px,${o.y||0}px,${o.z||0}px) rotateX(${o.rx||0}deg) rotateY(${o.ry||0}deg) rotateZ(${o.rz||0}deg) scale(${o.s??1})`;}
+
+/* generated app markup */
+function appHTML(o={}){const rough=o.rough;const cards=[];
+  const sel=`<div class="acard" id="${o.id||''}c1"><div class="h"><span class="ic">💡</span>选题</div>
+    <div class="row"><span class="cb on"></span>AI 工具测评合集</div><div class="row"><span class="cb"></span>一句话搭工作台</div><div class="row"><span class="cb"></span>周末效率复盘</div>
+    ${rough?'':'<div class="row" style="color:#38b889;font-weight:700">＋ 新增选题</div>'}</div>`;
+  const scr=`<div class="acard"><div class="h"><span class="ic">🎬</span>脚本</div><div class="row">今日脚本 · 3 段</div><div class="bar"><i style="width:60%"></i></div>${rough?'':'<div class="row" style="justify-content:space-between"><span>完成 60%</span><span style="background:#38b889;color:#fff;border-radius:8px;padding:3px 10px" class="savebtn">保存</span></div>'}</div>`;
+  const data=`<div class="acard"><div class="h"><span class="ic">📊</span>数据复盘</div><div style="display:flex;align-items:flex-end;gap:6px;height:48px;margin-top:6px">${[20,34,26,40,46,38,52].map(h=>`<i style="flex:1;height:${h*.9}px;border-radius:4px;background:${rough?'#9bb':'linear-gradient(180deg,#7ee0b8,#38b889)'}"></i>`).join('')}</div><div class="row">播放 1.2万 <b style="color:#38b889">↑18%</b></div></div>`;
+  const cal=`<div class="acard" style="opacity:${o.cal??0};margin-top:${o.cal?10:0}px;${o.cal?'':'height:0;padding:0;overflow:hidden'}"><div class="h"><span class="ic">📅</span>发布日历</div><div class="row">周三 · 周六 发布</div></div>`;
+  let list=[sel,scr,data];if(o.swap)list=[sel,data,scr];
+  return `<div class="app ${rough?'rough':''}" style="${o.bg?'background:'+o.bg:''}"><div class="hi">${rough?'':'早上好 👋'}</div><div class="tt">我的工作台</div>${list.join('')}${cal}<div class="toast" style="opacity:${o.toast||0}">✓ 已保存到浏览器本地</div></div>`;}
+function deskHTML(){return `<div class="desk"><div class="dh">我的工作台</div>
+  <div class="dc"><b style="font-size:24px">💡 选题</b><br>☑ AI 工具测评合集<br>☐ 一句话搭工作台<br>☐ 周末效率复盘</div>
+  <div class="dc"><b style="font-size:24px">🎬 脚本</b><br>今日脚本 · 3 段<br>完成 60%</div>
+  <div class="dc"><b style="font-size:24px">📊 数据复盘</b><br>播放 1.2万 ↑18%<br>▂▃▅▆▇</div></div>`;}
+
+/* ============ scenes ============ */
+const S=[];const scene=o=>S.push(o);
+
+scene({el:'#s-intro',ch:'第 4 期 · 搭工作台',cues:['从零到一，带你把 WorkBuddy 学会。',['一期讲透一个功能，每一步都带着你做。',.8]],
+ r(t,T){in3d($('#in-pill'),t,.1);in3d($('#in-t1'),t,.3,.8,{z:-1100,rx:40});in3d($('#in-t2'),t,T[1],.6);in3d($('#in-t3'),t,T[1]+1.0,.8,{z:-900,rx:-50});}});
+
+const ICONS=['🎵','📷','🗺️','💬','🛒','🎮','📚','☁️'];
+scene({el:'#s-hook',ch:'开篇',cues:['这期带你干一件特有成就感的事。','问你个问题：你手机上有没有一个 APP，是自己搭的？','不是买的，不是别人做的，',['是你跟 AI 说了一句话，它当场给你搓出来的。',1.0],['这期就干这个：搭一个你自己的工作台。',1.0]],
+ r(t,T){const q=$('#hk-q');in3d(q,t,.1,.7,{z:-500});
+  $('#hk-qt').innerHTML=t<T[1]?'干一件 <span class="neon">特有成就感</span> 的事':t<T[4]?'你手机上有没有一个 APP，是<span class="neon">自己搭的</span>？':'这期：搭一个 <span class="neon">你自己的工作台</span>';
+  // orbiting icons
+  const ob=$('#hk-orbit');ob.innerHTML=ICONS.map((ic,i)=>{const a=i/ICONS.length*Math.PI*2+t*.6;const x=Math.cos(a)*470,z=Math.sin(a)*320;const f=(z+320)/640;
+    return `<div style="position:absolute;left:-48px;top:-48px;width:96px;height:96px;border-radius:24px;background:rgba(255,255,255,${.06+f*.1});border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:48px;transform:translate3d(${x}px,${Math.sin(a*2)*30}px,${z}px);opacity:${(.3+f*.7)*prog(t,.3,.8)*(1-prog(t,T[2]-.3,.5))}">${ic}</div>`;}).join('');
+  const ph=$('#hk-ph');const pp=eback(prog(t,.2,1.0));ph.style.opacity=clamp(pp*2);
+  const spin=t<T[3]?t*40:0;phoneT(ph,t,{z:(1-pp)*-1200,ry:(t<T[3]?Math.sin(t*.8)*25:lerp(Math.sin(T[3]*.8)*25,-12,ease(prog(t,T[3],.8)))),rx:6});
+  // screen: question mark → generated app
+  const built=prog(t,T[3]+.6,1.0);
+  $('#hk-scr').innerHTML=built>0?`<div style="position:absolute;inset:0;opacity:${built};transform:scale(${.8+.2*eout(built)})">${appHTML({})}</div>`+(built<1?`<div class="abs center" style="inset:0;font-size:80px;opacity:${1-built}">✨</div>`:''):`<div class="abs center" style="inset:0;background:linear-gradient(160deg,#1c2150,#0e1130);flex-direction:column;gap:10px;color:#fff"><div style="font-size:90px">❓</div><div style="font-size:18px;color:#b9c0e8">自己搭的 APP？</div></div>`;
+  // left: not bought / not others
+  const L=[];if(t>=T[2])L.push(`<div class="glass" style="padding:18px 24px;font-size:28px;font-weight:700;margin-bottom:18px;opacity:${prog(t,T[2],.4)}">🛒 不是买的 <span style="color:#ff6b8a">✗</span></div>`);
+  if(t>=T[2]+.8)L.push(`<div class="glass" style="padding:18px 24px;font-size:28px;font-weight:700;opacity:${prog(t,T[2]+.8,.4)}">👥 不是别人做的 <span style="color:#ff6b8a">✗</span></div>`);
+  $('#hk-l').innerHTML=L.join('');
+  const R=[];if(t>=T[3])R.push(`<div class="panel" style="padding:18px 22px;font-size:22px;margin-bottom:18px;opacity:${prog(t,T[3],.4)}"><div style="font-size:16px;color:var(--ink3)">你对 AI 说一句话</div>“帮我搭一个工作台”</div>`);
+  if(t>=T[3]+1.4)R.push(`<div class="glass" style="padding:18px 24px;font-size:28px;font-weight:700;border-color:var(--mint);opacity:${prog(t,T[3]+1.4,.4)}">⚡ 当场搓出来 <span style="color:var(--mint)">✓</span></div>`);
+  $('#hk-r').innerHTML=R.join('');
+  if(t>=T[4]){const g=eout(prog(t,T[4],.6));ph.querySelector('.body').style.boxShadow=`0 0 0 2px rgba(62,240,181,${g}),0 0 ${60*g}px rgba(62,240,181,.6),0 40px 80px rgba(0,0,0,.5)`;}else ph.querySelector('.body').style.boxShadow='';}});
+
+$('#th-row').innerHTML=[['📁','建专属文件夹','设成工作目录'],['🧩','想清楚模块','5～6 个就够'],['📱','想清楚在哪用','手机优先']].map((c,i)=>`<div class="glass abs th" style="left:${240+i*500}px;top:0;width:440px;height:400px;padding:40px;text-align:center"><div style="font-size:22px;color:var(--mint);font-weight:900">选择 0${i+1}</div><div style="font-size:96px;margin-top:10px">${c[0]}</div><div style="font-size:40px;font-weight:900;margin-top:10px">${c[1]}</div><div style="font-size:24px;color:#b9c0e8;margin-top:8px">${c[2]}</div></div>`).join('');
+scene({el:'#s-three',ch:'动手前 · 三个选择',cues:[['动手前，先做三个选择，能省一大半返工。',1.2]],
+ r(t,T){$$('.th').forEach((e,i)=>{const p=eback(prog(t,.3+i*.3,.8));e.style.opacity=clamp(p*2);
+   e.style.transform=`translate3d(0,${(1-p)*100}px,${(1-p)*-900}px) rotateY(${(i-1)*-18*(1)+(1-p)*(i-1)*-60}deg)`;});}});
+
+/* ---- app: folder ---- */
+function appReset(view){$('#v-file').style.opacity=view==='file'?1:0;$('#v-chat').style.opacity=view==='chat'?1:0;
+  $('#nv-file').className='it'+(view==='file'?' on':'');$('#nv-chat').className='it'+(view==='chat'?' on':'');$('#co1').style.opacity=0;$('#co2').style.opacity=0;}
+scene({el:'#s-app',ch:'选择 01 · 专属文件夹',cues:['第一，建专属文件夹。',['在 WorkBuddy 里建一个“我的工作台”文件夹，设成工作目录。',2.2],['别嫌麻烦——不设的话，生成的文件散一地，后面找都找不到。',1.2]],
+ r(t,T){appReset('file');const nf=T[1]-.2,nm=nf+.6,rc=T[1]+1.9,st=rc+.9;
+  const fd=$('#fd-new');fd.style.opacity=t>=nf?1:0;fd.style.transform=t>=nf?`scale(${eback(prog(t,nf,.5))})`:'';
+  $('#fd-name').innerHTML=t>=nm?typed('我的工作台',t,nm,8)+(t<rc?caret(t):''):'';
+  $('#menu').style.opacity=t>=rc&&t<st+.2?1:0;const mr=localCenter('#fd-new');$('#menu').style.left=(mr[0]-230+60)+'px';$('#menu').style.top=(mr[1]-52+10)+'px';
+  $('#mn-set').className=t>=st-.4?'on':'';$('#fd-pin').style.opacity=t>=st?1:0;
+  fd.classList.toggle('glow',t>=st&&t<T[2]);
+  $('#wd').innerHTML=t>=st?'工作目录：<b style="color:var(--ok)">📌 我的工作台</b>':'工作目录：未设置';
+  camera(t,[[0,null,.95,10,-16],[1,null,1,4,-6],[nf,'#fd-new',1.4,4,-8,900,470],[st+.6,'#fd-new',1.4,4,-8,900,470],[T[2],null,.82,8,14,780,470],[T[3],null,.82,8,14,780,470]],t);
+  const files=['index.html','style.css','app.js','icon.png','data.json','manifest.json'];
+  const chaos=t>=T[2]?prog(t,T[2]+.2,.6):0;
+  coShow('#co1',t,T[2]+.1,99,`<div style="display:flex;gap:18px"><div style="flex:1"><div style="color:#ff8fa3;font-weight:900">✗ 不设工作目录</div><div style="position:relative;height:150px">${files.map((f,i)=>`<span style="position:absolute;left:${[10,120,40,150,80,0][i]}px;top:${[10,30,70,90,120,110][i]}px;transform:rotate(${[-14,10,-6,18,-20,8][i]}deg);font-size:15px;background:rgba(255,255,255,.12);padding:3px 8px;border-radius:6px">📄${f}</span>`).join('')}</div></div>
+    <div style="flex:1"><div style="color:var(--mint);font-weight:900">✓ 设成工作目录</div><div style="font-size:16px;line-height:1.55;margin-top:6px">📁 我的工作台/<br>${files.slice(0,4).map(f=>'　📄 '+f).join('<br>')}</div></div></div>`,{ry0:6,ry:30,dx:-80});
+  $('#co1').style.left='1210px';$('#co1').style.top='560px';$('#co1').style.width='600px';
+  cursorPath(t,[[0,[1500,700]],[.8,'#nv-file',1],[nf-.1,'#btn-nf',1],[rc,'#fd-new',1],[st-.4,'#mn-set',1],[T[2],'#mn-set',0,120,90]]);}});
+
+/* ---- modules ---- */
+const MODS=[['💡','选题'],['🎬','脚本'],['📊','数据复盘'],['📅','发布日历'],['💬','评论管理'],['🧠','灵感库'],['📈','涨粉分析'],['🎨','封面库'],['🤝','商单'],['📦','素材'],['🔔','提醒'],['📝','笔记']];
+scene({el:'#s-mod',ch:'选择 02 · 模块',cues:['第二，先想清楚要哪几个模块。',['建议五六个就够。比如做自媒体的：选题、脚本、数据复盘。',1.0],['贪多是大忌，模块越多生成越慢、出错越多，先跑核心的几个。',2.0]],
+ r(t,T){$('#md-s').textContent=t<T[2]?'建议 5～6 个就够':'贪多是大忌 · 先跑核心的几个';
+  const over=prog(t,T[2]+.2,1.6),back=prog(t,T[2]+3.4,.8);
+  const n=t<T[2]?6:Math.round(6+6*over*(1-back));const core=back>0;
+  const st=$('#md-stage');st.innerHTML=MODS.map((m,i)=>{const show=i<n||(core&&i<3);const a=i<6?.3+i*.18:T[2]+.2+(i-6)*.25;const p=eback(prog(t,a,.5));
+    const isCore=i<3;const hl=t>=T[1]+1.2&&isCore;
+    let x,y,z,rz=0;
+    if(core){const k=i<3?i:-1;x=(k-1)*300;y=-40;z=k>=0?120*back:0;}
+    else{const cols=6,row=Math.floor(i/cols),col=i%cols;x=(col-2.5)*215;y=-130+row*190;z=0;
+      if(i>=6){rz=Math.sin(t*9+i)*6*over;}}
+    const vis=show?clamp(p*2)*(core&&i>=3?1-back:1):0;
+    const err=i>=6&&over>.5&&!core&&(i%2===0);
+    return `<div style="position:absolute;left:-95px;top:-80px;width:190px;height:160px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:24px;font-weight:900;
+      background:${hl?'#fff':'rgba(255,255,255,.08)'};color:${hl?'#1d2033':'#fff'};border:${hl?'3px solid var(--mint)':'1px solid rgba(255,255,255,.2)'};${hl?'box-shadow:0 0 40px rgba(62,240,181,.5);':''}
+      opacity:${vis};transform:translate3d(${x}px,${y+(1-p)*80}px,${z+(1-p)*-500}px) rotateX(${(1-p)*60}deg) rotateZ(${rz}deg)"><span style="font-size:52px">${m[0]}</span>${m[1]}${err?'<span style="position:absolute;top:-12px;right:-12px;background:#ff4d6d;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px">!</span>':''}</div>`;}).join('');
+  const mt=$('#md-meter');mt.style.opacity=t>=T[2]?prog(t,T[2],.4):0;
+  const mins=Math.round(2+10*over*(1-back));$('#md-time').innerHTML=`${mins} 分钟${mins>6?' <span style="font-size:24px;color:#ff8fa3">⚠ 变慢</span>':''}`;
+  $('#md-err').style.width=(10+80*over*(1-back))+'%';}});
+
+/* ---- screens ---- */
+scene({el:'#s-scr',ch:'选择 03 · 在哪用',cues:['第三，想清楚在哪用。',['手机上看的话，提示词开头必须加“手机优先”四个字。',1.2],['少了这四个字，出来的页面在电脑上很好看，手机上挤成一团。',2.4]],
+ r(t,T){const mon=$('#sc-mon');in3d(mon,t,.2,.8,{ry:30,z:-800});mon.style.transform+=` rotateY(${12+Math.sin(t*.6)*3}deg)`;
+  $('#sc-mon-scr').innerHTML=`<div style="transform:scale(.872);transform-origin:0 0">${deskHTML()}</div>`;
+  const ph=$('#sc-ph');const pp=eback(prog(t,.5,.9));ph.style.opacity=clamp(pp*2);phoneT(ph,t,{z:(1-pp)*-900,ry:-18+Math.sin(t*.7)*5,rx:4});
+  const fixed=t>=T[2]+3.0;const sq=t>=T[2];
+  $('#sc-ph-scr').innerHTML=fixed?appHTML({}):sq?`<div style="position:absolute;inset:0;background:#fff"><div style="transform:scale(.276);transform-origin:0 0;margin-top:40px">${deskHTML()}</div><div style="position:absolute;left:10px;right:10px;top:230px;text-align:center;color:#e03131;font-weight:900;font-size:16px">字太小 · 挤成一团 😵</div></div>`
+    :`<div class="abs center" style="inset:0;background:linear-gradient(160deg,#1c2150,#0e1130);color:#b9c0e8;font-size:18px;flex-direction:column;gap:8px"><div style="font-size:60px">📱</div>在手机上看？</div>`;
+  $('#sc-ph-tag').innerHTML=fixed?'<span class="tag" style="background:rgba(62,240,181,.18);color:var(--mint)">加了「手机优先」✓ 单列排布</span>':sq?'<span class="tag" style="background:rgba(255,77,109,.18);color:#ff8fa3">手机上：挤成一团 ✗</span>':'';
+  if(sq&&!fixed){ph.style.transform+=` translateX(${Math.sin(t*50)*(t<T[2]+.8?4:0)}px)`;}
+  $('#sc-mon-ok').style.opacity=t>=T[2]?1:0;
+  const k=$('#sc-key');in3d(k,t,T[1]+.2,.6,{rx:60,z:-300});k.style.opacity=t>=T[1]+.2&&t<T[2]?k.style.opacity:(t>=T[2]+2.4?prog(t,T[2]+2.4,.4):0);}});
+
+/* ---- formula ---- */
+const FM=[['人','我是谁','“我是自媒体人”','--k1'],['块','要哪几块','“需要选题、脚本、数据复盘三个模块”','--k2'],['样','长什么样','“薄荷绿渐变背景，白卡片，大字”','--k3'],['屏','在哪看','“手机打开，单列排布”','--k4'],['存','数据存哪','“数据存在浏览器本地”','--k5']];
+$('#fm-row').innerHTML=FM.map((f,i)=>`<div class="glass fm" style="flex:1;padding:28px 24px;position:relative"><div class="center fm-g" style="width:130px;height:130px;border-radius:30px;font-size:84px;font-weight:900;color:#0b0e24;background:var(${f[3]});box-shadow:0 0 50px var(${f[3]})">${f[0]}</div>
+  <div style="font-size:34px;font-weight:900;margin-top:22px">${f[1]}</div><div class="fm-d" style="font-size:24px;color:#dfe3ff;line-height:1.6;margin-top:14px;opacity:0">${f[2]}</div></div>`).join('');
+scene({el:'#s-form',ch:'写提示词 · 五要素',cues:[['然后写提示词。五件事说清，口诀：人、块、样、屏、存。',1.0],'人，我是谁。比如“我是自媒体人”。','块，要哪几块。比如“需要选题、脚本、数据复盘三个模块”。','样，长什么样。比如“薄荷绿渐变背景，白卡片，大字”。','屏，在哪看。比如“手机打开，单列排布”。',['存，数据存哪。比如“数据存在浏览器本地”。',.8]],
+ r(t,T){let act=0;for(let i=1;i<=5;i++)if(t>=T[i])act=i;
+  $$('.fm').forEach((e,i)=>{const p=eback(prog(t,.8+i*.45,.7));const on=act===i+1;const lift=on?eout(prog(t,T[i+1],.4)):0;
+   e.style.opacity=clamp(p*2)*(act&&!on&&act<=5?.55:1);e.style.transformOrigin='50% 100%';
+   e.style.transform=`translate3d(0,${(1-p)*140-lift*30}px,${(1-p)*-600+lift*160}px) rotateX(${(1-p)*-85}deg) rotateY(${on?Math.sin(t*1.5)*4:0}deg)`;
+   e.querySelector('.fm-d').style.opacity=act>i?1:0;e.style.borderColor=on?'var(--mint)':'rgba(255,255,255,.16)';
+   const g=e.querySelector('.fm-g');g.style.transform=`rotateY(${(1-p)*360}deg)`;});
+  if(t>=T[6]-1.2)$$('.fm').forEach(e=>e.style.opacity=1);}});
+
+/* ---- app chat prompt ---- */
+const PRM=[['我是自媒体人','人'],['，需要选题、脚本、数据复盘三个模块','块'],['，手机打开单列排布','屏'],['，薄荷绿渐变加白卡片大字','样'],['，数据存在浏览器本地','存'],['。','']];
+const PLEN=PRM.reduce((a,s)=>a+[...s[0]].length,0);
+function prmHTML(n,hl){let o='',k=n;for(const[s,c]of PRM){const ch=[...s];const take=ch.slice(0,Math.max(0,Math.min(ch.length,k))).join('');k-=ch.length;if(!take)break;o+=(c&&hl)?`<span class="s-${c}">${take}</span>`:take;}return o;}
+scene({el:'#s-app',ch:'写提示词 · 串起来',cues:['串起来就是一条完整提示词：',['“我是自媒体人，需要选题、脚本、数据复盘三个模块，手机打开单列排布，薄荷绿渐变加白卡片大字，数据存在浏览器本地。”',1.6],['你看，没有一句废话，但它要的每样东西都在。',1.6]],
+ r(t,T){appReset('chat');$('#wd').innerHTML='工作目录：<b style="color:var(--ok)">📌 我的工作台</b>';$('#msgs').innerHTML='';
+  const ta=T[1]-.3;const n=Math.floor(Math.max(0,t-ta)*9.5);const hl=t>=T[2];
+  $('#inp').className='inp focus';$('#inp-t').innerHTML=t>=ta?prmHTML(Math.min(n,PLEN),hl)+(n<PLEN?caret(t):''):'<span class="ph">给 WorkBuddy 发消息…</span>'+caret(t);
+  camera(t,[[0,null,.9,10,14],[.9,'#inp',1.25,6,-6,960,560],[T[3],'#inp',1.25,6,-6,960,560]],t);
+  const lg=[['人','我是谁','--k1'],['块','要哪几块','--k2'],['屏','在哪看','--k4'],['样','长什么样','--k3'],['存','数据存哪','--k5']];
+  coShow('#co2',t,T[2],99,`<div style="display:flex;gap:16px;align-items:center">`+lg.map(([g,d,c],i)=>`<div style="flex:1;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:14px;border:2px solid var(${c});opacity:${prog(t,T[2]+i*.3,.3)}"><span class="center" style="width:46px;height:46px;border-radius:12px;background:var(${c});color:#0b0e24;font-weight:900;font-size:28px">${g}</span><span style="font-size:20px">${d} ✓</span></div>`).join('')+`<div style="font-size:24px;font-weight:900;color:var(--mint);white-space:nowrap;opacity:${prog(t,T[2]+1.8,.4)}">没有一句废话</div></div>`,{dx:0,dy:80,ry:0,ry0:0});
+  $('#co2').style.top='800px';
+  cursorState=null;}});
+
+/* ---- build exploded ---- */
+const FILES=[['index.html','<div class="app">\n  <header>我的工作台</header>\n  <section id="topics">…\n  <section id="script">…\n  <section id="stats">…'],['style.css','.app{\n  background:linear-gradient(\n    #A8E6CF,#DCEDC1);\n  font-size:18px }\n.card{ border-radius:18px }'],['app.js','const db = localStorage;\nfunction save(k,v){\n  db.setItem(k,JSON.stringify(v))\n}\nrender();']];
+scene({el:'#s-build',ch:'等几分钟 · 它在干嘛',cues:['发出去之后，等几分钟。','这几分钟它在干什么？',['规划结构、写代码文件、自己检查。',4.4]],
+ r(t,T){$('#bd-t').innerHTML=t<T[1]?'发出去之后，等几分钟':'这几分钟，它在干什么？';
+  const a1=T[2],a2=T[2]+1.8,a3=T[2]+3.6;
+  const phase=t<a1?0:t<a2?1:t<a3?2:3;
+  // exploded phone: layers
+  const exp=eout(prog(t,.4,1.2))*(1-ease(prog(t,a3+1.2,1.0)));
+  const ry=-28+Math.sin(t*.5)*10+exp*-8,rx=18*exp+4;
+  const layers=[
+    {z:0,html:`<div style="position:absolute;inset:0;border-radius:36px;background:${phase>=2?'linear-gradient(165deg,#A8E6CF,#DCEDC1 55%,#f7fff9)':'rgba(62,240,181,.08)'};border:2px ${phase>=2?'solid':'dashed'} rgba(62,240,181,.8)"></div>`},
+    {z:70,html:`<div style="position:absolute;left:14px;top:44px;right:14px;height:50px;border-radius:12px;border:2px ${phase>=2?'solid':'dashed'} rgba(76,201,255,.9);${phase>=2?'background:rgba(255,255,255,.0)':''};color:${phase>=2?'#1f3b33':'#bfefff'};font-size:${phase>=2?24:15}px;font-weight:900;padding:8px">${phase>=2?'我的工作台':'header'}</div>`},
+    ...[0,1,2].map(i=>({z:140+i*60,html:`<div style="position:absolute;left:14px;right:14px;top:${110+i*150}px;height:136px;border-radius:18px;border:2px ${phase>=2?'solid':'dashed'} rgba(167,139,250,.9);background:${phase>=2?'#fff':'rgba(167,139,250,.08)'};padding:12px;font-size:${phase>=2?18:14}px;font-weight:900;color:${phase>=2?'#1f3b33':'#e5dcff'}">${phase>=2?['💡 选题','🎬 脚本','📊 数据复盘'][i]:['section#topics','section#script','section#stats'][i]}</div>`}))];
+  const bp=$('#bd-ph');const pin=eback(prog(t,.1,.9));bp.style.opacity=clamp(pin*2);
+  bp.style.transform=`perspective(1800px) translateZ(${(1-pin)*-1000}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  bp.innerHTML=`<div style="position:absolute;inset:-12px;border-radius:46px;background:#15182e;transform:translateZ(-20px);box-shadow:0 0 0 2px rgba(255,255,255,.1)"></div>`+layers.map((l,i)=>`<div style="position:absolute;inset:0;transform:translateZ(${l.z*exp}px)">${l.html}</div>`).join('')+
+    (phase===3||t>=a3?`<div style="position:absolute;left:-10px;right:-10px;height:6px;top:${((t-a3)*260)%640-10}px;background:linear-gradient(90deg,transparent,var(--mint),transparent);box-shadow:0 0 20px var(--mint);transform:translateZ(${360*exp}px);opacity:${t<a3+1.6?1:0}"></div>`:'');
+  // steps
+  const steps=[['📐','规划结构',a1],['💻','写代码文件',a2],['🔍','自己检查',a3]];
+  $('#bd-steps').innerHTML=steps.map(([ic,n,a],i)=>{const on=t>=a,done=t>=a+1.8||(i===2&&t>=a+1.6);const p=eout(prog(t,a-.2,.5));
+    return `<div class="glass" style="display:flex;align-items:center;gap:18px;padding:18px 24px;margin-bottom:18px;opacity:${on?1:.3};transform:translate3d(${(1-p)*-80}px,0,${(1-p)*-200}px);${on&&!done?'border-color:var(--mint);box-shadow:0 0 30px rgba(62,240,181,.35)':''}">
+      <span style="font-size:46px">${ic}</span><span style="font-size:32px;font-weight:900">${n}</span><span style="margin-left:auto;font-size:28px;color:var(--mint)">${done?'✓':on?'<span class="sp" style="transform:rotate('+t*400+'deg);border-color:rgba(255,255,255,.2);border-top-color:#3ef0b5"></span>':''}</span></div>`;}).join('');
+  // files
+  $('#bd-files').innerHTML=FILES.map(([n,c],i)=>{const a=a2+i*.45;const p=eback(prog(t,a,.6));const txt=[...c].slice(0,Math.floor(Math.max(0,t-a)*40)).join('');
+    return `<div style="position:absolute;left:0;top:${i*120}px;width:520px;height:230px;border-radius:18px;background:rgba(14,18,44,.92);border:1px solid rgba(76,201,255,.4);padding:14px 18px;opacity:${clamp(p*2)};
+      transform:perspective(1400px) translate3d(${(1-p)*300}px,0,${(1-p)*-600+i*40}px) rotateY(-22deg);box-shadow:0 20px 50px rgba(0,0,0,.5)"><div style="font-size:15px;color:var(--mint);font-weight:700;margin-bottom:6px">📄 ${n}</div><div class="code">${txt.replace(/</g,'&lt;')}</div></div>`;}).join('');
+  const ck=$('#bd-clock');ck.style.opacity=prog(t,T[0]+.4,.4);const mm=Math.min(3.2,t*.55);ck.innerHTML=`⏱ 已等待 ${Math.floor(mm)} 分 ${String(Math.floor((mm%1)*60)).padStart(2,'0')} 秒 · 喝口水`;}});
+
+/* ---- iterate ---- */
+scene({el:'#s-iter',ch:'三轮迭代',cues:['初版出来，别急着嫌弃——',['结构对就算成功，好看是后面的事。',1.2],'按三轮改：',['第一轮只调结构：模块增增减减、排布对不对；',1.8],['第二轮抠细节：颜色、字体、图标；',1.8],['第三轮测功能：数据能不能保存、按钮灵不灵。',2.0],['顺序别乱——你先抠颜色，回头改结构，颜色全白抠。',2.2]],
+ r(t,T){const ttl=t<T[2]?'初版：结构对就算成功':t<T[6]?'按 <span class="neon">三轮</span> 改':'顺序 <span style="color:#ff8fa3">别乱</span>';$('#it-t').innerHTML=t<T[1]?'初版出来，别急着嫌弃':ttl;
+  const ph=$('#it-ph');const pp=eback(prog(t,.1,.9));ph.style.opacity=clamp(pp*2);
+  const spin=(k)=>prog(t,k,.8);const flip=[T[3],T[4],T[5]].reduce((a,k)=>a+Math.sin(spin(k)*Math.PI)*.0+ease(spin(k)),0);
+  phoneT(ph,t,{z:(1-pp)*-1000,ry:-14+Math.sin(t*.6)*6+flip*360,rx:5});
+  const r1=t>=T[3]+.9,r2=t>=T[4]+.9,r3=t>=T[5]+.9;
+  const toast=r3?clamp(prog(t,T[5]+1.8,.3))*(1-prog(t,T[5]+3.4,.3)):0;
+  $('#it-scr').innerHTML=appHTML({rough:!r2,cal:r1?1:0,swap:r1,toast});
+  if(r3&&t>=T[5]+1.4&&t<T[5]+1.9){const b=$('#it-scr .savebtn');if(b)b.style.boxShadow='0 0 0 4px rgba(56,184,137,.4)';}
+  const rounds=[['01','只调结构','模块增增减减 · 排布对不对','🧱'],['02','抠细节','颜色 · 字体 · 图标','🎨'],['03','测功能','数据能不能存 · 按钮灵不灵','🧪']];
+  $('#it-rounds').innerHTML=(t<T[2]?`<div class="glass" style="padding:26px 30px;opacity:${prog(t,T[1],.4)}"><div style="font-size:30px;font-weight:900">✓ 结构对 = 成功</div><div style="font-size:24px;color:#b9c0e8;margin-top:8px">好看，是后面的事</div></div>`:
+    rounds.map(([n,a,b,ic],i)=>{const k=T[3+i];const on=t>=k&&t<(T[4+i]??99);const p=eback(prog(t,T[2]+.2+i*.25,.6));
+    return `<div class="glass" style="display:flex;gap:18px;align-items:center;padding:18px 22px;margin-bottom:16px;opacity:${clamp(p*2)*(t>=k||t<T[3]?1:.45)};transform:translate3d(${on?30:0}px,0,${(1-p)*-500+(on?80:0)}px);${on?'border-color:var(--mint);box-shadow:0 0 34px rgba(62,240,181,.35)':''}">
+      <div style="font-size:48px">${ic}</div><div><div style="font-size:18px;color:var(--mint);font-weight:900">第 ${n} 轮</div><div style="font-size:32px;font-weight:900">${a}</div><div style="font-size:19px;color:#b9c0e8">${b}</div></div>${t>=(T[4+i]??T[6])?'<div style="margin-left:auto;font-size:30px;color:var(--mint)">✓</div>':''}</div>`;}).join(''));
+  // side notes
+  let side='';
+  if(t>=T[3]+.9&&t<T[4])side=`<div class="glass" style="padding:20px 24px;font-size:22px;line-height:1.8">＋ 新增「📅 发布日历」<br>↕ 数据复盘上移</div>`;
+  else if(t>=T[4]+.9&&t<T[5])side=`<div class="glass" style="padding:20px 24px;font-size:22px;line-height:1.8"><span style="display:inline-block;width:26px;height:26px;border-radius:6px;background:#A8E6CF;vertical-align:middle"></span> 色值 #A8E6CF<br>🔠 标题加大加粗<br>✨ 每个模块配图标</div>`;
+  else if(t>=T[5]+.9&&t<T[6])side=`<div class="glass" style="padding:20px 24px;font-size:22px;line-height:1.8">👆 点「保存」→ 提示已保存<br>🔄 刷新页面 → 数据还在 ✓</div>`;
+  else if(t>=T[6]){const w=prog(t,T[6]+1.4,.8);side=`<div class="glass" style="padding:22px 26px;font-size:22px;line-height:1.9"><div style="color:#ff8fa3;font-weight:900;font-size:26px">✗ 错误顺序</div>🎨 先抠颜色（花 1 小时）<br>🧱 回头改结构<br><span style="opacity:${w}">💥 <b style="color:#ff8fa3">颜色全白抠</b></span>
+    <div style="display:flex;gap:8px;margin-top:10px">${['#A8E6CF','#DCEDC1','#ffd3b6','#ffaaa5'].map((c,i)=>`<span style="width:44px;height:44px;border-radius:10px;background:${c};transform:translateY(${w*(40+i*20)}px) rotate(${w*(i%2?40:-40)}deg);opacity:${1-w};display:inline-block"></span>`).join('')}</div>
+    <div style="color:var(--mint);font-weight:900;margin-top:4px">✓ 结构 → 细节 → 功能</div></div>`;}
+  $('#it-side').innerHTML=side;}});
+
+/* ---- publish (app) ---- */
+scene({el:'#s-app',ch:'发布到手机',cues:['本地没问题，发到手机。',['发一句：“帮我发布，给我一个手机能打开的链接。”',3.4]],
+ r(t,T){appReset('chat');$('#wd').innerHTML='工作目录：<b style="color:var(--ok)">📌 我的工作台</b>';
+  const msg='帮我发布，给我一个手机能打开的链接。';const ta=T[1]+.2,sent=ta+msg.length/11+.4;
+  $('#inp').className='inp'+(t<sent?' focus':'');$('#inp-t').innerHTML=t>=ta&&t<sent?typed(msg,t,ta,11)+caret(t):'<span class="ph">给 WorkBuddy 发消息…</span>';
+  const m=[`<div class="bub ai" style="font-size:17px">✅ 工作台已生成：3 个模块 · 手机单列 · 薄荷绿主题 · 数据存浏览器本地<br><span style="color:var(--ink3)">📁 我的工作台/index.html · style.css · app.js</span></div>`];
+  if(t>=sent)m.push(`<div class="bub me">${msg}</div>`);
+  if(t>=sent+.6)m.push(`<div class="bub ai" id="pub">${t<sent+1.6?'<span class="sp" style="transform:rotate('+t*400+'deg)"></span> 正在发布…':`🚀 已发布！手机浏览器打开这个链接：<div style="display:flex;gap:16px;align-items:center;margin-top:10px"><div style="width:90px;height:90px;border-radius:10px;background:repeating-conic-gradient(#1d2033 0 25%,#fff 0 50%) 0 0/18px 18px;border:6px solid #fff;box-shadow:0 0 0 1px var(--line)"></div><div><div style="font-size:20px;color:var(--brand);font-weight:700;text-decoration:underline">https://你的专属链接/我的工作台</div><div style="font-size:15px;color:var(--ink3)">扫码或在手机浏览器打开</div></div></div>`}</div>`);
+  $('#msgs').innerHTML=m.join('');
+  if(t>=sent+1.6)$('#pub').classList.add('glow');
+  camera(t,[[0,null,.9,10,-14],[.9,'#inp',1.2,6,6,960,580],[sent,'#inp',1.2,6,6,960,580],[sent+.8,'#msgs',1.05,6,-8,960,470],[T[2],'#msgs',1.05,6,-8,960,470]],t);
+  cursorPath(t,[[0,[1500,800]],[ta-.2,'#inp',1,200,0],[sent-.1,'#inp .send',1],[T[2],'#inp .send',0,-200,-60]]);}});
+
+/* ---- install ---- */
+function browser(url,body,o={}){return `<div style="position:absolute;inset:0;background:#f4f5fa">
+  <div style="position:absolute;left:0;right:0;top:0;height:${o.bottomBar?40:78}px;background:#fff;border-bottom:1px solid #e4e6f0;padding:${o.bottomBar?'0':'40px 10px 0'}">${o.bottomBar?'':`<div style="height:30px;border-radius:9px;background:#f0f1f6;display:flex;align-items:center;padding:0 10px;font-size:12px;color:#555;gap:6px">🔒 ${url}<span style="margin-left:auto;font-size:16px">${o.menu?'⋮':''}</span></div>`}</div>
+  <div style="position:absolute;left:0;right:0;top:${o.bottomBar?0:78}px;bottom:${o.bottomBar?56:0}px;overflow:hidden">${body}</div>
+  ${o.bottomBar?`<div style="position:absolute;left:0;right:0;bottom:0;height:56px;background:#fff;border-top:1px solid #e4e6f0;display:flex;align-items:center;justify-content:space-around;font-size:18px;color:#1c7ed6"><span>‹</span><span>›</span><span id="${o.shareId}" style="font-size:20px">⬆︎</span><span>📖</span><span>⧉</span></div>`:''}</div>`;}
+function homeScreen(newIcon,land){const apps=['📷','🗓️','🗺️','🎵','☁️','💬','🛒','📚','⚙️','🧮','🎮'];
+  return `<div style="position:absolute;inset:0;background:linear-gradient(160deg,#3b2f8f,#0f7a6a);padding:60px 18px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px 10px">${apps.map(a=>`<div style="text-align:center"><div style="width:52px;height:52px;margin:0 auto;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:28px">${a}</div></div>`).join('')}
+    <div style="text-align:center;opacity:${newIcon}"><div style="width:52px;height:52px;margin:0 auto;border-radius:14px;background:linear-gradient(165deg,#A8E6CF,#38b889);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 ${20*land}px #3ef0b5;transform:scale(${1+ (1-land)*1.2}) translateY(${(1-land)*-120}px)">🗂️</div><div style="font-size:11px;color:#fff;margin-top:4px">我的工作台</div></div></div></div>`;}
+scene({el:'#s-inst',ch:'添加到主屏幕',cues:['用手机浏览器打开这个链接：',['苹果，点分享按钮，选“添加到主屏幕”；',2.0],['安卓，点右上角三个点，选“安装应用”。',2.0],['从此它就在你桌面上，像一个正经 APP。',2.0]],
+ r(t,T){const A=$('#is-a'),B=$('#is-b');const pa=eback(prog(t,.1,.9)),pb=eback(prog(t,.4,.9));
+  A.style.opacity=clamp(pa*2);B.style.opacity=clamp(pb*2);
+  const home=t>=T[3];const hr=ease(prog(t,T[3],.8));
+  phoneT(A,t,{z:(1-pa)*-1000,ry:18+Math.sin(t*.6)*4-hr*14,rx:4,x:hr*120});phoneT(B,t,{z:(1-pb)*-1000,ry:-18-Math.sin(t*.6)*4+hr*14,rx:4,x:-hr*120});
+  $('#is-t').innerHTML=t<T[1]?'用手机浏览器打开链接':t<T[3]?'添加到 <span class="neon">主屏幕</span>':'从此它就在你 <span class="neon">桌面上</span>';
+  const aStep=t<T[1]+.8?0:t<T[1]+1.8?1:t<T[3]?2:3;
+  const app=`<div style="position:absolute;inset:0;transform:scale(1);">${appHTML({}).replace('padding:44px','padding:14px')}</div>`;
+  const shareSheet=`<div style="position:absolute;left:0;right:0;bottom:0;height:${aStep>=1?300:0}px;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.2);padding:16px;overflow:hidden">
+    <div style="font-size:13px;color:#888">分享</div><div style="margin-top:10px;font-size:15px;line-height:2.6">
+    <div style="border-bottom:1px solid #eee">📋 拷贝</div><div style="border-bottom:1px solid #eee">🔖 添加书签</div>
+    <div style="border-radius:8px;${aStep>=2?'background:#e7f5ff;color:#1c7ed6;font-weight:700':''};padding:0 6px" id="a-add">➕ 添加到主屏幕</div></div></div>`;
+  $('#is-a-scr').innerHTML=home?homeScreen(1,eback(prog(t,T[3]+.2,.8))):`<div style="position:absolute;inset:44px 0 0 0">${browser('你的专属链接/我的工作台',app,{bottomBar:true,shareId:'a-share'})}${shareSheet}</div>`;
+  const bStep=t<T[2]+.8?0:t<T[2]+1.8?1:t<T[3]?2:3;
+  const menu=`<div style="position:absolute;right:8px;top:${44+34}px;width:180px;background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;font-size:14px;line-height:2.4;opacity:${bStep>=1?1:0}">
+    <div style="padding:0 8px">🔄 刷新</div><div style="padding:0 8px">⭐ 书签</div><div style="padding:0 8px;border-radius:6px;${bStep>=2?'background:#e6fcf5;color:#0ca678;font-weight:700':''}" id="b-inst">📲 安装应用</div></div>`;
+  $('#is-b-scr').innerHTML=home?homeScreen(1,eback(prog(t,T[3]+.5,.8))):`<div style="position:absolute;inset:44px 0 0 0">${browser('你的专属链接/我的工作台',app,{menu:true})}</div>${menu}`;
+  $('#is-la').style.opacity=prog(t,T[1],.4);$('#is-lb').style.opacity=prog(t,T[2],.4);
+  const glowA=t>=T[1]&&t<T[3],glowB=t>=T[2]&&t<T[3];
+  A.querySelector('.body').style.boxShadow=glowA?'0 0 0 2px #4cc9ff,0 0 50px rgba(76,201,255,.5)':home?'0 0 0 2px #3ef0b5,0 0 50px rgba(62,240,181,.5)':'';
+  B.querySelector('.body').style.boxShadow=glowB?'0 0 0 2px #3ef0b5,0 0 50px rgba(62,240,181,.5)':home?'0 0 0 2px #3ef0b5,0 0 50px rgba(62,240,181,.5)':'';}});
+
+/* ---- faq ---- */
+const FAQ=[['📱','手机界面挤','提示词补「手机优先」，重新生成'],['💾','数据丢了','检查提示词里有没有「存浏览器本地」'],['⛔','生成到一半断了','任务拆开：先做选题，再做复盘'],['🎨','颜色不对','别写「清新一点」，直接给色值 <b style="background:#A8E6CF;padding:0 6px;border-radius:4px">#A8E6CF</b>'],['🔗','链接打不开','先刷新，再检查网络'],['⬜','桌面图标是灰的','补一条图标链接给它']];
+$('#fq-grid').innerHTML=FAQ.map((f,i)=>`<div class="faq" id="fq${i}"><div class="f fa"><div style="font-size:18px;color:#ff8fa3;font-weight:900">问题 0${i+1}</div><div style="font-size:60px;margin-top:6px">${f[0]}</div><div style="font-size:36px;font-weight:900;margin-top:6px">${f[1]}</div></div>
+  <div class="f fb"><div style="font-size:18px;color:var(--ok);font-weight:900">${f[0]} ${f[1]} → 解法</div><div style="font-size:30px;font-weight:900;margin-top:18px;line-height:1.5;color:#1d2033">${f[2]}</div></div></div>`).join('');
+scene({el:'#s-faq',ch:'六个常见问题',cues:['六个常见问题，对号入座。','手机界面挤——提示词补“手机优先”，重新生成；','数据丢了——检查提示词里有没有“存浏览器本地”；','生成到一半断了——任务拆开，先做选题模块，再做复盘模块；','颜色不对——别写“清新一点”，直接给色值，比如“#A8E6CF”；','链接打不开——先刷新，再检查网络；',['桌面图标是灰的——补一条图标链接给它。',1.2]],
+ r(t,T){FAQ.forEach((f,i)=>{const e=$('#fq'+i);const p=eback(prog(t,.2+i*.12,.6));const fl=ease(prog(t,T[i+1]+.2,.7));const on=t>=T[i+1]&&t<T[i+2];
+   e.style.opacity=clamp(p*2);e.style.transform=`translate3d(0,${(1-p)*80}px,${(1-p)*-700+(on?90:0)}px) rotateX(${(1-p)*50}deg) rotateY(${fl*180}deg)`;});}});
+
+scene({el:'#s-magic',ch:'收尾',cues:['这期是整个系列特别像“变魔术”的一期，',['但你已经看到了，魔术背后就是五要素提示词加三轮迭代。',2.2]],
+ r(t,T){$('#mg-t').innerHTML=t<T[1]?'像「<span class="neon">变魔术</span>」的一期':'魔术背后，就这两样';
+  const c=$('#mg-c');const cp=eback(prog(t,.3,.8));c.style.opacity=clamp(cp*2);c.style.transform=`translateZ(${(1-cp)*-800}px) rotate(${Math.sin(t*2)*12}deg) scale(${1+Math.sin(t*3)*.05})`;
+  in3d($('#mg-a'),t,T[1]+.3,.8,{ry:60,z:-800});in3d($('#mg-b'),t,T[1]+1.1,.8,{ry:-60,z:-800});
+  $('#mg-p').style.opacity=prog(t,T[1]+.8,.3);$('#mg-e').style.opacity=prog(t,T[1]+1.7,.3);
+  $('#mg-a').style.opacity=t<T[1]+.3?0:$('#mg-a').style.opacity;}});
+
+scene({el:'#s-next',ch:'下期预告',cues:['下期讲它含金量很高的功能：专家——','为什么你的 AI 回答总不落地。',['想抄作业，评论区扣个“教程”，',1.0],['我把工作台的完整提示词模板发给你，改三个词就能用。',2.4]],
+ r(t,T){in3d($('#nx-card'),t,.2,.8,{ry:30,z:-900});in3d($('#nx-cmt'),t,T[2],.7,{rx:40});
+  $('#nx-in').innerHTML=typed('教程',t,T[2]+.8,3)+(t<T[3]+.6?caret(t):'');in3d($('#nx-reply'),t,T[3]+.8,.6,{rx:50});}});
+
+/* ---- timeline ---- */
+const CPS=7.0,BASE=.5;const plain=s=>s.replace(/<[^>]+>/g,'');let cur=0;const CUES=[];
+for(const sc of S){sc.start=cur;sc.T=[];let lt=0;for(const c of sc.cues){const[txt,hold]=Array.isArray(c)?c:[c,0];const d=Math.max(1.7,BASE+[...plain(txt)].length/CPS)+hold;sc.T.push(lt);CUES.push({s:cur+lt,e:cur+lt+d-.12,text:plain(txt)});lt+=d;}
+  sc.T.push(lt);sc.dur=lt+.35;cur+=sc.dur;}
+const TOTAL=cur+1.0;window.TOTAL=TOTAL;window.CUES=CUES;
+
+/* ---- background: stars with warp ---- */
+const XF=.5;
+const BOUNDS=[];S.forEach((s,i)=>{if(i>0&&S[i-1].el!==s.el)BOUNDS.push(s.start);});
+const warpAt=t=>{let w=0;for(const b of BOUNDS){const d=Math.abs(t-b);if(d<.7)w=Math.max(w,1-d/.7);}return ease(w);};
+const DT=.02,DIST=[0];for(let i=1;i*DT<=TOTAL+1;i++)DIST.push(DIST[i-1]+DT*(1+warpAt(i*DT)*14));
+const distAt=t=>{const i=Math.min(DIST.length-2,Math.floor(t/DT));return lerp(DIST[i],DIST[i+1],(t-i*DT)/DT);};
+const ST=[];let seed=11;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+for(let i=0;i<80;i++)ST.push({a:rnd()*Math.PI*2,r0:rnd()*1100,sp:30+rnd()*50});
+$('#stars').innerHTML=ST.map((s,i)=>`<div class="star" id="st${i}"></div>`).join('');
+function bg(t){const w=warpAt(t),D=distAt(t);
+  $('#floor').style.backgroundPosition=`0 ${(D*50)%140}px`;
+  $('#orb1').style.transform=`translate(${Math.sin(t*.2)*90}px,${Math.cos(t*.25)*60}px)`;$('#orb2').style.transform=`translate(${Math.cos(t*.18)*90}px,${Math.sin(t*.22)*70}px)`;$('#orb3').style.transform=`translate(${Math.sin(t*.15)*120}px,${Math.cos(t*.2)*50}px)`;
+  ST.forEach((s,i)=>{const r=((s.r0+D*s.sp)%1100)+20;const k=r/1100;const x=960+Math.cos(s.a)*r*1.1,y=460+Math.sin(s.a)*r*.62;const len=3+k*8+w*260*k;
+    const e=$('#st'+i);e.style.width=len+'px';e.style.transform=`translate(${x-len}px,${y}px) rotate(${s.a}rad)`;e.style.transformOrigin='100% 50%';e.style.opacity=(.15+k*.6)*(1-w*.2)+w*.3;});
+  $('#horizon').style.opacity=.6+w*.4;}
+
+function render(t){let ci=S.findIndex(s=>t>=s.start&&t<s.start+s.dur);if(ci<0)ci=S.length-1;const sc=S[ci],lt=t-sc.start;bg(t);
+  $$('.scene').forEach(e=>e.style.opacity=0);cursorState=null;const el=$(sc.el);const prev=S[ci-1],next=S[ci+1];let pin=1,pout=0;
+  if(!(prev&&prev.el===sc.el))pin=eout(clamp(lt/XF));if(!(next&&next.el===sc.el))pout=ease(clamp((lt-(sc.dur-XF))/XF));
+  if(ci===S.length-1)pout=ease(clamp((t-(TOTAL-.9))/.9));
+  el.style.opacity=pin*(1-pout);el.style.transform=`translate3d(0,0,${(1-pin)*-1400+pout*900}px) rotateX(${(1-pin)*8}deg) rotateZ(${(1-pin)*-3+pout*3}deg)`;
+  el.style.filter=pout>0?`blur(${pout*8}px)`:(pin<1?`blur(${(1-pin)*6}px)`:'none');
+  $('#world').style.transform=`rotateX(${Math.sin(t*.3)*1.2}deg) rotateY(${Math.cos(t*.23)*1.8}deg)`;
+  sc.r(lt,sc.T);
+  const cu=$('#cursor'),rp=$('#ripple');const o=pin*(1-pout);
+  if(cursorState){cu.style.opacity=o;cu.style.transform=`translate(${cursorState.x-6}px,${cursorState.y-4}px)`;if(cursorState.click){const c=cursorState.click;rp.style.opacity=(1-c.p)*o;rp.style.transform=`translate(${c.x-40}px,${c.y-40}px) scale(${.3+c.p})`;}else rp.style.opacity=0;}
+  else{cu.style.opacity=0;rp.style.opacity=0;}
+  $('#chapter').textContent=sc.ch;$('#progress').style.width=(t/TOTAL*1920)+'px';}
+window.render=render;window.warm=async()=>{for(let t=0;t<TOTAL;t+=.5)render(t);await document.fonts.ready;render(0);return TOTAL;};
+render(0);
+</script>
+</body>
+</html>

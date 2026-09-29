@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>WorkBuddy Skill 教程</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/900.css">
+<style>
+:root{
+  --bg:#f4f5fb; --ink:#1d2033; --ink2:#5a5f7a; --ink3:#9a9fb8; --line:#e4e6f0;
+  --brand:#5b5bf6; --brand2:#8b5cf6; --brandSoft:#eeeefe; --ok:#16a36a; --okSoft:#e6f7ef;
+  --warn:#e8590c; --warnSoft:#fff1e7; --bad:#e03131; --badSoft:#ffecec; --gold:#f59f00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#0f1020}
+body{font-family:'Noto Sans SC','WenQuanYi Zen Hei',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;
+  background:radial-gradient(1200px 700px at 15% 10%,#e9e8ff 0%,transparent 60%),radial-gradient(1000px 700px at 90% 90%,#e3f1ff 0%,transparent 60%),var(--bg)}
+.scene{position:absolute;inset:0;opacity:0}
+.abs{position:absolute}
+.center{display:flex;align-items:center;justify-content:center}
+
+/* ---------- subtitles ---------- */
+#sub{position:absolute;left:0;right:0;bottom:44px;display:flex;justify-content:center;z-index:50;pointer-events:none}
+#sub span{background:rgba(16,17,34,.82);color:#fff;font-size:46px;font-weight:500;line-height:1.35;padding:14px 34px;border-radius:14px;
+  letter-spacing:1px;max-width:1700px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+#sub span b{color:#ffd43b;font-weight:700}
+
+/* ---------- top badge ---------- */
+#badge{position:absolute;left:48px;top:36px;z-index:40;display:flex;gap:12px;align-items:center}
+#badge .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:900;font-size:22px}
+#badge .t{font-size:22px;font-weight:700;color:var(--ink)}
+#badge .c{font-size:20px;color:var(--brand);background:#fff;border:1px solid var(--line);padding:6px 16px;border-radius:99px;font-weight:500}
+#progress{position:absolute;left:0;top:0;height:6px;background:linear-gradient(90deg,var(--brand),var(--brand2));z-index:60}
+
+/* ---------- cursor ---------- */
+#cursor{position:absolute;z-index:45;width:40px;height:40px;left:0;top:0;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+#ripple{position:absolute;z-index:44;width:80px;height:80px;border-radius:50%;border:4px solid var(--brand);opacity:0;pointer-events:none}
+
+/* ---------- app window ---------- */
+.win{position:absolute;left:150px;top:112px;width:1620px;height:800px;background:#fff;border-radius:18px;
+  box-shadow:0 30px 80px rgba(40,40,90,.22),0 0 0 1px rgba(30,30,60,.06);overflow:hidden}
+.win .bar{height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:10px;background:#fafbfe}
+.win .dot{width:14px;height:14px;border-radius:50%}
+.win .bar .ttl{margin-left:18px;font-size:18px;font-weight:700;color:var(--ink)}
+.win .bar .right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;font-size:17px;font-weight:500;padding:9px 18px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ok{background:var(--okSoft);border-color:#bfe8d3;color:var(--ok)}
+.side{position:absolute;left:0;top:52px;bottom:0;width:230px;background:#f8f9fd;border-right:1px solid var(--line);padding:18px 14px}
+.side .it{display:flex;align-items:center;gap:12px;font-size:18px;color:var(--ink2);padding:12px 14px;border-radius:10px;margin-bottom:4px}
+.side .it.on{background:var(--brandSoft);color:var(--brand);font-weight:700}
+.side .ic{width:22px;text-align:center}
+.side .sep{height:1px;background:var(--line);margin:14px 6px}
+.side .h{font-size:14px;color:var(--ink3);padding:4px 14px}
+.main{position:absolute;left:230px;top:52px;right:0;bottom:0}
+
+/* market */
+.mk-head{padding:24px 34px 0}
+.mk-title{font-size:28px;font-weight:900}
+.mk-sub{font-size:16px;color:var(--ink3);margin-top:4px}
+.search{margin-top:18px;height:54px;border:2px solid var(--line);border-radius:12px;display:flex;align-items:center;padding:0 18px;gap:12px;font-size:19px;color:var(--ink3);background:#fff}
+.search.focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,246,.12);color:var(--ink)}
+.caret{display:inline-block;width:2px;height:24px;background:var(--brand);vertical-align:middle;margin-left:2px}
+.tabs{display:flex;gap:8px;margin-top:16px;align-items:center}
+.tab{font-size:17px;padding:8px 18px;border-radius:99px;color:var(--ink2);background:#f2f3f8}
+.tab.on{background:var(--ink);color:#fff;font-weight:500}
+.sort{margin-left:auto;font-size:16px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:20px 34px}
+.card{border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:#fff;position:relative;height:178px}
+.card .row{display:flex;align-items:center;gap:12px}
+.card .ico{width:48px;height:48px;border-radius:12px;font-size:24px;flex:none}
+.card .nm{font-size:20px;font-weight:700}
+.card .tag{font-size:13px;padding:2px 8px;border-radius:6px;margin-left:6px;font-weight:500}
+.tag.rec{background:#fff4e0;color:#c77700}
+.tag.third{background:#f1f1f5;color:#8a8fa8}
+.card .ds{font-size:15.5px;color:var(--ink2);line-height:1.55;margin-top:10px;height:48px;overflow:hidden}
+.card .ft{display:flex;align-items:center;margin-top:12px;font-size:15px;color:var(--ink3);gap:14px}
+.card .ft .btn{margin-left:auto;padding:6px 16px;font-size:15px}
+.hl{position:absolute;border:4px solid #ffb700;border-radius:12px;box-shadow:0 0 0 9999px rgba(15,16,32,.0);pointer-events:none;z-index:30;opacity:0}
+.note{position:absolute;z-index:31;background:#ffb700;color:#1d2033;font-weight:700;font-size:22px;padding:8px 18px;border-radius:10px;opacity:0;white-space:nowrap}
+.note:after{content:'';position:absolute;left:24px;top:100%;border:10px solid transparent;border-top-color:#ffb700}
+.note.below:after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#ffb700}
+
+/* chat */
+.chat{position:absolute;inset:0;display:flex;flex-direction:column}
+.chat .msgs{flex:1;padding:30px 60px;overflow:hidden;display:flex;flex-direction:column;gap:22px}
+.bub{max-width:900px;font-size:19px;line-height:1.6;padding:14px 20px;border-radius:16px}
+.bub.me{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.bub.ai{align-self:flex-start;background:#f4f5fa;border:1px solid var(--line);border-bottom-left-radius:4px}
+.inp{margin:0 60px 28px;border:2px solid var(--line);border-radius:16px;min-height:74px;padding:20px 22px;font-size:20px;display:flex;align-items:center;gap:10px;position:relative;background:#fff}
+.inp.focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,246,.12)}
+.inp .ph{color:var(--ink3)}
+.inp .send{margin-left:auto;width:44px;height:44px;border-radius:12px;background:var(--brand);color:#fff;font-size:22px;flex:none}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--brandSoft);color:var(--brand);border:1px solid #cfd0fd;border-radius:8px;padding:3px 10px;font-weight:700;font-size:18px}
+.slash{position:absolute;left:0;bottom:calc(100% + 10px);width:520px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(30,30,80,.18);padding:8px;opacity:0}
+.slash .sh{font-size:14px;color:var(--ink3);padding:8px 12px}
+.slash .si{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:18px}
+.slash .si .d{font-size:14px;color:var(--ink3);margin-left:auto}
+.slash .si.on{background:var(--brandSoft)}
+.tool{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin-bottom:10px;width:fit-content}
+.tool .sp{width:18px;height:18px;border-radius:50%;border:3px solid #d9dafc;border-top-color:var(--brand)}
+.res li{margin-left:22px;margin-top:4px}
+
+/* dropdown / dialog */
+.dd{position:absolute;right:20px;top:58px;width:300px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(30,30,80,.18);padding:8px;z-index:20;opacity:0}
+.dd .di{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:10px;font-size:18px}
+.dd .di small{display:block;font-size:13px;color:var(--ink3)}
+.dd .di.on{background:var(--brandSoft)}
+.modal{position:absolute;inset:52px 0 0 0;background:rgba(20,22,40,.35);z-index:25;opacity:0}
+.modal .box{position:absolute;left:50%;top:70px;width:900px;margin-left:-450px;background:#fff;border-radius:18px;padding:28px 32px;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.step{display:flex;align-items:center;gap:14px;font-size:19px;padding:10px 0;color:var(--ink2);opacity:0}
+.step .st{width:30px;height:30px;border-radius:50%;flex:none;font-size:16px;color:#fff}
+
+/* generic big text */
+.h1{font-size:84px;font-weight:900;letter-spacing:2px}
+.h2{font-size:60px;font-weight:900}
+.grad{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pill{display:inline-block;padding:10px 26px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:26px;color:var(--ink2)}
+.panel{background:#fff;border-radius:22px;box-shadow:0 20px 60px rgba(40,40,90,.14);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="progress"></div>
+  <div id="badge"><div class="logo center">W</div><div class="t">WorkBuddy 从零到一</div><div class="c" id="chapter">Skill 技能篇</div></div>
+
+  <!-- ======= S0 intro ======= -->
+  <div class="scene" id="s-intro">
+    <div class="abs center" style="inset:0;flex-direction:column;gap:30px;padding-bottom:120px">
+      <div class="pill" id="in-pill">新手系列 · 一期讲透一个功能</div>
+      <div class="h1" id="in-t1">从零到一，带你把 <span class="grad">WorkBuddy</span> 学会</div>
+      <div id="in-t2" style="font-size:40px;color:var(--ink2);font-weight:500">本期：<b style="color:var(--ink)">Skill 技能</b>　是什么 · 怎么装 · 怎么用</div>
+    </div>
+  </div>
+
+  <!-- ======= S1 hook ======= -->
+  <div class="scene" id="s-hook">
+    <div class="abs center" style="left:0;right:0;top:150px;flex-direction:column;gap:16px">
+      <div class="h2" id="hk-q">Skill 到底是啥？</div>
+    </div>
+    <div class="abs" id="hk-l" style="left:230px;top:300px;width:680px;height:420px">
+      <div class="panel" style="height:100%;padding:34px">
+        <div style="font-size:30px;font-weight:900;color:var(--ok)">🚀 别人：像开了挂</div>
+        <div style="margin-top:26px" class="bub me" >/周报生成 本周数据</div>
+        <div style="margin-top:18px;font-size:22px;color:var(--ink2);line-height:1.8">✅ 一句话 → 格式标准的周报<br>✅ 每次输出都一样稳</div>
+      </div>
+    </div>
+    <div class="abs" id="hk-r" style="left:1010px;top:300px;width:680px;height:420px">
+      <div class="panel" style="height:100%;padding:34px">
+        <div style="font-size:30px;font-weight:900;color:var(--bad)">😮‍💨 你：像在求人</div>
+        <div style="margin-top:26px;font-size:21px;line-height:1.9;color:var(--ink2)">“帮我写周报，要分三段……”<br>“不对，标题要加粗……”<br>“求你了，再按我说的改一遍……”</div>
+        <div style="margin-top:14px;font-size:22px;color:var(--bad);font-weight:700">🔁 重做第 3 次</div>
+      </div>
+    </div>
+    <div class="abs center" id="hk-three" style="left:0;right:0;top:330px;gap:40px;opacity:0">
+      <div class="panel center" style="width:460px;height:300px;flex-direction:column;gap:18px"><div style="font-size:64px;font-weight:900" class="grad">01</div><div style="font-size:38px;font-weight:900">它是什么</div></div>
+      <div class="panel center" style="width:460px;height:300px;flex-direction:column;gap:18px"><div style="font-size:64px;font-weight:900" class="grad">02</div><div style="font-size:38px;font-weight:900">怎么挑 · 怎么装</div></div>
+      <div class="panel center" style="width:460px;height:300px;flex-direction:column;gap:18px"><div style="font-size:64px;font-weight:900" class="grad">03</div><div style="font-size:38px;font-weight:900">装完怎么用</div></div>
+    </div>
+  </div>
+
+  <!-- ======= chapter card (shared) ======= -->
+  <div class="scene" id="s-chap">
+    <div class="abs center" style="inset:0;flex-direction:column;gap:24px;padding-bottom:100px">
+      <div id="ch-n" style="font-size:150px;font-weight:900;line-height:1" class="grad">01</div>
+      <div id="ch-t" class="h1">它是什么？</div>
+      <div id="ch-s" style="font-size:34px;color:var(--ink2)"></div>
+    </div>
+  </div>
+
+  <!-- ======= S2 manual metaphor ======= -->
+  <div class="scene" id="s-book">
+    <div class="abs center" style="left:0;right:0;top:130px;"><div class="h2">Skill = 一本 <span class="grad">「标准动作说明书」</span></div></div>
+    <div class="abs panel" id="bk-book" style="left:560px;top:280px;width:800px;height:520px;padding:40px 50px">
+      <div style="display:flex;align-items:center;gap:16px"><div class="center" style="width:64px;height:64px;border-radius:16px;background:var(--brandSoft);font-size:34px">📘</div>
+      <div><div style="font-size:32px;font-weight:900">周报生成</div><div style="font-size:18px;color:var(--ink3)">SKILL.md · 标准动作说明书</div></div></div>
+      <div id="bk-steps" style="margin-top:30px;font-size:24px;line-height:2.1;color:var(--ink2)">
+        <div class="bks">① 读取本周工作记录与数据</div>
+        <div class="bks">② 按「成果 / 问题 / 下周计划」三段整理</div>
+        <div class="bks">③ 标题加粗，数据用表格呈现</div>
+        <div class="bks">④ 控制在 500 字以内，语气简洁</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= APP window (market / chat views) ======= -->
+  <div class="scene" id="s-app">
+    <div class="win" id="win">
+      <div class="bar">
+        <div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div class="ttl">WorkBuddy</div>
+        <div class="right">
+          <div class="btn" id="btn-add">＋ 添加技能 ▾</div>
+          <div class="center" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffd6a5,#fdffb6);font-size:18px">🙂</div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="it" id="nav-chat"><span class="ic">💬</span>新对话</div>
+        <div class="it" id="nav-market"><span class="ic">🧩</span>技能市场</div>
+        <div class="it"><span class="ic">⚙️</span>自动化</div>
+        <div class="it"><span class="ic">📁</span>我的文件</div>
+        <div class="sep"></div>
+        <div class="h">已安装技能 <span id="inst-count"></span></div>
+        <div id="inst-list" style="font-size:16px;color:var(--ink2);padding:6px 14px;line-height:2"></div>
+      </div>
+      <div class="main">
+        <!-- market view -->
+        <div id="v-market" class="abs" style="inset:0">
+          <div class="mk-head">
+            <div class="mk-title">技能市场</div>
+            <div class="mk-sub">给 AI 装上"标准动作"，一句话调用成熟流程</div>
+            <div class="search" id="mk-search"><span>🔍</span><span id="mk-q" class="ph">搜索技能名称或用途，如「安全扫描」</span></div>
+            <div class="tabs"><div class="tab on" id="tab-all">全部</div><div class="tab" id="tab-rec">⭐ 推荐</div><div class="tab">办公</div><div class="tab">开发</div><div class="tab">内容创作</div>
+              <div class="sort" id="mk-sort">排序：综合 ▾</div></div>
+          </div>
+          <div class="grid" id="mk-grid"></div>
+        </div>
+        <!-- chat view -->
+        <div id="v-chat" class="abs chat" style="inset:0;opacity:0">
+          <div class="msgs" id="ch-msgs"></div>
+          <div class="inp" id="ch-inp">
+            <div class="slash" id="slash">
+              <div class="sh">技能 · 输入以筛选</div>
+              <div class="si" id="sl-1"><span>🌐</span><b>Web Search</b><span class="d">联网搜索</span></div>
+              <div class="si" id="sl-2"><span>📝</span><b>周报生成</b><span class="d">办公</span></div>
+              <div class="si" id="sl-3"><span>🎙️</span><b>录音转文字</b><span class="d">音频</span></div>
+              <div class="si" id="sl-4"><span>🧭</span><b>网页操作</b><span class="d">浏览器</span></div>
+              <div class="si" id="sl-5"><span>🔎</span><b>查找技能</b><span class="d">工具</span></div>
+            </div>
+            <span id="ch-in"><span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span></span>
+            <div class="send center">➤</div>
+          </div>
+        </div>
+      </div>
+      <!-- dropdown -->
+      <div class="dd" id="dd">
+        <div class="di" id="dd-1"><span>🧩</span><div>浏览技能市场<small>手动挑选、安装</small></div></div>
+        <div class="di" id="dd-2"><span>🔎</span><div>查找技能<small>说需求，自动搜索并安装</small></div></div>
+        <div class="di" id="dd-3"><span>📦</span><div>从文件导入<small>本地技能包</small></div></div>
+      </div>
+      <!-- modal -->
+      <div class="modal" id="modal"><div class="box">
+        <div style="font-size:26px;font-weight:900">🔎 查找技能</div>
+        <div style="font-size:16px;color:var(--ink3);margin-top:4px">用一句话描述你的需求，自动搜索、筛选并安装合适的技能</div>
+        <div class="search" id="md-search" style="margin-top:18px"><span id="md-q"></span></div>
+        <div style="margin-top:14px" id="md-steps">
+          <div class="step" id="st1"><div class="st center" style="background:var(--brand)">1</div>正在技能市场中搜索「剪视频」相关技能…</div>
+          <div class="step" id="st2"><div class="st center" style="background:var(--brand)">2</div>找到 3 个候选，按推荐 + 下载量排序，已选中「视频剪辑助手」</div>
+          <div class="step" id="st3"><div class="st center" style="background:var(--brand)">3</div>安全扫描通过 · 正在安装…</div>
+          <div class="step" id="st4" style="color:var(--ok);font-weight:700"><div class="st center" style="background:var(--ok)">✓</div>「视频剪辑助手」已安装，现在可以直接用了</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ======= S3 compare ======= -->
+  <div class="scene" id="s-cmp">
+    <div class="abs center" style="left:0;right:0;top:120px"><div class="h2">有没有 Skill，差别有多大？</div></div>
+    <div class="abs panel" id="cmp-l" style="left:140px;top:240px;width:800px;height:620px;padding:28px 32px">
+      <div style="font-size:28px;font-weight:900;color:var(--bad)">❌ 没有技能</div>
+      <div id="cmp-l-body" style="margin-top:18px;display:flex;flex-direction:column;gap:14px"></div>
+    </div>
+    <div class="abs panel" id="cmp-r" style="left:980px;top:240px;width:800px;height:620px;padding:28px 32px">
+      <div style="font-size:28px;font-weight:900;color:var(--ok)">✅ 有了技能</div>
+      <div id="cmp-r-body" style="margin-top:18px;display:flex;flex-direction:column;gap:14px"></div>
+    </div>
+    <!-- shortcut metaphor -->
+    <div class="abs center" id="cmp-sc" style="left:0;right:0;top:250px;gap:80px;opacity:0">
+      <div class="panel center" style="width:620px;height:520px;flex-direction:column;gap:24px">
+        <div style="width:220px;height:380px;border-radius:36px;border:10px solid #1d2033;background:#f4f5fb;padding:24px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start">
+          <div id="sc-tile" class="center" style="grid-column:span 2;height:90px;border-radius:18px;background:linear-gradient(135deg,#ff6b6b,#f59f00);color:#fff;font-size:18px;font-weight:700">⚡ 打卡下班</div>
+          <div style="height:70px;border-radius:14px;background:#74c0fc"></div><div style="height:70px;border-radius:14px;background:#b197fc"></div>
+          <div style="height:70px;border-radius:14px;background:#63e6be"></div><div style="height:70px;border-radius:14px;background:#ffd43b"></div>
+        </div>
+        <div style="font-size:30px;font-weight:700">手机：<span class="grad">按一下</span>出结果</div>
+      </div>
+      <div style="font-size:80px;color:var(--ink3)">≈</div>
+      <div class="panel center" style="width:620px;height:520px;flex-direction:column;gap:30px">
+        <div style="width:520px;border:2px solid var(--brand);border-radius:16px;padding:22px;font-size:22px;box-shadow:0 0 0 4px rgba(91,91,246,.12)"><span class="chip">/ 周报生成</span> 本周数据</div>
+        <div id="sc-out" style="width:520px;background:#f4f5fa;border-radius:14px;padding:18px 22px;font-size:19px;line-height:1.8;color:var(--ink2)"><b style="color:var(--ink)">📄 本周周报</b><br>一、成果 ✓　二、问题 ✓　三、下周计划 ✓</div>
+        <div style="font-size:30px;font-weight:700">WorkBuddy：<span class="grad">一句话</span>出结果</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= S road (two ways) ======= -->
+  <div class="scene" id="s-road">
+    <div class="abs center" id="rd-title" style="left:0;right:0;top:150px"><div class="h2">两条路</div></div>
+    <div class="abs center" style="left:0;right:0;top:300px;gap:60px">
+      <div class="panel" id="rd-a" style="width:640px;height:420px;padding:44px">
+        <div id="rd-a-n" style="font-size:22px;color:var(--brand);font-weight:700">第一条</div>
+        <div id="rd-a-t" style="font-size:52px;font-weight:900;margin-top:10px">手动挑</div>
+        <div id="rd-a-tag" style="display:inline-block;margin-top:16px;font-size:26px;padding:6px 18px;border-radius:10px;background:var(--okSoft);color:var(--ok);font-weight:700">最稳</div>
+        <div id="rd-a-d" style="margin-top:26px;font-size:24px;color:var(--ink2);line-height:1.8">技能市场 → 搜关键词 → 看推荐和下载量 → 安装</div>
+      </div>
+      <div class="panel" id="rd-b" style="width:640px;height:420px;padding:44px">
+        <div id="rd-b-n" style="font-size:22px;color:var(--brand);font-weight:700">第二条</div>
+        <div id="rd-b-t" style="font-size:52px;font-weight:900;margin-top:10px">自动找</div>
+        <div id="rd-b-tag" style="display:inline-block;margin-top:16px;font-size:26px;padding:6px 18px;border-radius:10px;background:var(--brandSoft);color:var(--brand);font-weight:700">最省事</div>
+        <div id="rd-b-d" style="margin-top:26px;font-size:24px;color:var(--ink2);line-height:1.8">添加技能 → 查找技能 → 说出需求 → 自动搜索并安装</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= S mix summary ======= -->
+  <div class="scene" id="s-mix">
+    <div class="abs center" style="left:0;right:0;top:140px"><div class="h2">我的建议：<span class="grad">混着用</span></div></div>
+    <div class="abs center" style="left:0;right:0;top:300px;gap:60px">
+      <div class="panel" id="mx-a" style="width:640px;height:400px;padding:44px">
+        <div style="font-size:26px;color:var(--ink3)">简单任务</div>
+        <div style="font-size:52px;font-weight:900;margin-top:8px">直接说</div>
+        <div style="margin-top:28px;font-size:24px;color:var(--ink2);line-height:1.8">“用 Web Search 查一下……”<br><b style="color:var(--brand)">⚡ 占「省事」</b></div>
+      </div>
+      <div class="panel" id="mx-b" style="width:640px;height:400px;padding:44px">
+        <div style="font-size:26px;color:var(--ink3)">复杂任务</div>
+        <div style="font-size:52px;font-weight:900;margin-top:8px">点名调</div>
+        <div style="margin-top:28px;font-size:24px;color:var(--ink2);line-height:1.8"><span class="chip">/ Web Search</span> 查一下……<br><b style="color:var(--ok)">🛡️ 占「稳定」</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= S list ======= -->
+  <div class="scene" id="s-list">
+    <div class="abs center" style="left:0;right:0;top:120px;flex-direction:column;gap:10px"><div class="h2">新手必装清单 <span style="font-size:34px;color:var(--ink3)">· 速记</span></div></div>
+    <div class="abs" id="ls-grid" style="left:160px;right:160px;top:260px;display:grid;grid-template-columns:repeat(5,1fr);gap:24px"></div>
+    <div class="abs center" id="ls-tip" style="left:0;right:0;top:760px;opacity:0"><div class="pill" style="font-size:30px;color:var(--ink);border:3px solid #ffb700;background:#fffaf0">👉 先装前 5 个，够你应付 <b style="color:var(--warn)">80%</b> 的活</div></div>
+  </div>
+
+  <!-- ======= S pit ======= -->
+  <div class="scene" id="s-pit">
+    <div class="abs center" style="left:0;right:0;top:120px"><div class="h2">最大的坑：技能在<span class="grad">精</span>不在<span style="color:var(--bad)">多</span></div></div>
+    <div class="abs panel" style="left:260px;top:260px;width:1400px;height:560px;padding:40px 50px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="font-size:28px;font-weight:700">已安装技能</div>
+        <div id="pit-n" style="font-size:64px;font-weight:900;color:var(--bad)">30</div>
+        <div id="pit-st" style="font-size:24px;padding:8px 18px;border-radius:10px;background:var(--badSoft);color:var(--bad);font-weight:700">⚠️ 占资源 · 互相干扰</div>
+      </div>
+      <div id="pit-grid" style="margin-top:26px;display:grid;grid-template-columns:repeat(10,1fr);gap:14px"></div>
+    </div>
+  </div>
+
+  <!-- ======= S next / CTA ======= -->
+  <div class="scene" id="s-next">
+    <div class="abs panel" id="nx-card" style="left:260px;top:170px;width:1400px;height:320px;padding:44px 56px;display:flex;align-items:center;gap:44px">
+      <div class="center" style="width:200px;height:200px;border-radius:40px;background:linear-gradient(135deg,var(--brand),var(--brand2));font-size:100px;flex:none">⚙️</div>
+      <div>
+        <div style="font-size:26px;color:var(--brand);font-weight:700">下期预告</div>
+        <div style="font-size:64px;font-weight:900;margin-top:6px">让任务自己跑：自动化</div>
+        <div style="font-size:30px;color:var(--ink2);margin-top:10px">解放双手，就学这个</div>
+      </div>
+    </div>
+    <div class="abs panel" id="nx-cmt" style="left:260px;top:530px;width:1400px;height:300px;padding:34px 50px;opacity:0">
+      <div style="font-size:24px;font-weight:700;color:var(--ink2)">💬 评论区</div>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:22px">
+        <div class="center" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#a5d8ff,#d0bfff);font-size:28px">🙋</div>
+        <div id="nx-in" style="flex:1;height:70px;border:2px solid var(--brand);border-radius:14px;padding:0 22px;display:flex;align-items:center;font-size:30px"></div>
+        <div class="btn pri" style="font-size:22px;padding:14px 28px">发送</div>
+      </div>
+      <div id="nx-reply" style="margin-top:22px;font-size:24px;color:var(--ok);font-weight:700;opacity:0">📩 已私信你：《WorkBuddy 新手必装清单》</div>
+    </div>
+  </div>
+
+  <!-- highlight & note overlays -->
+  <div class="hl" id="hl"></div>
+  <div class="note" id="note"></div>
+  <div class="hl" id="hl2"></div>
+
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22.5 L15.5 21 L12 14 L19 14 Z" fill="#fff" stroke="#111" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  <div id="sub"><span></span></div>
+</div>
+
+<script>
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eout=x=>1-Math.pow(1-x,3);
+const prog=(t,a,d=.5)=>clamp((t-a)/d);          // 0..1 progress starting at a over d sec
+const fadeIn=(el,t,a,d=.45,dy=24)=>{const p=eout(prog(t,a,d));el.style.opacity=p;el.style.transform=`translateY(${(1-p)*dy}px)`;return p;};
+const show=(el,on)=>{el.style.opacity=on?1:0;};
+const typed=(s,t,a,cps=11)=>{const n=Math.floor(Math.max(0,t-a)*cps);return [...s].slice(0,n).join('');};
+const caret=(t)=> (Math.floor(t*2)%2===0)?'<span class="caret"></span>':'<span class="caret" style="opacity:0"></span>';
+window.MISSING=new Set();function rectOf(sel){const e=typeof sel==='string'?$(sel):sel;if(!e){MISSING.add(sel);return {left:960,top:540,width:0,height:0,right:960,bottom:540};}return e.getBoundingClientRect();}
+function centerOf(sel,dx=0,dy=0){const r=rectOf(sel);return [r.left+r.width/2+dx,r.top+r.height/2+dy];}
+
+/* cursor: keyframes [time, target(selector|[x,y]), click?] */
+let cursorState=null;
+function cursorPath(t,kf){
+  const pts=kf.map(k=>{const p=typeof k[1]==='string'?centerOf(k[1],k[3]||0,k[4]||0):k[1];return {t:k[0],x:p[0],y:p[1],c:k[2]};});
+  let x=pts[0].x,y=pts[0].y;
+  for(let i=0;i<pts.length;i++){
+    if(t>=pts[i].t){x=pts[i].x;y=pts[i].y;}
+    if(i<pts.length-1&&t>=pts[i].t&&t<pts[i+1].t){
+      const mv=Math.min(.7,pts[i+1].t-pts[i].t);const s=pts[i+1].t-mv;
+      if(t>=s){const p=ease((t-s)/mv);x=pts[i].x+(pts[i+1].x-pts[i].x)*p;y=pts[i].y+(pts[i+1].y-pts[i].y)*p;}
+    }
+  }
+  let click=null;for(const p of pts){if(p.c&&t>=p.t&&t<p.t+.45)click={x:p.x,y:p.y,p:(t-p.t)/.45};}
+  cursorState={x,y,click};
+}
+function highlight(id,t,a,b,sel,pad=8,noteTxt,notePos='above'){
+  const el=$(id);const on=t>=a&&t<b;
+  if(!on){el.style.opacity=0;if(id==='#hl')$('#note').style.opacity=0;return;}
+  const r=rectOf(sel);const p=eout(prog(t,a,.3))*(1-prog(t,b-.3,.3));
+  Object.assign(el.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+pad*2+'px',height:r.height+pad*2+'px',opacity:p});
+  if(noteTxt&&id==='#hl'){const n=$('#note');n.textContent=noteTxt;n.className='note'+(notePos==='below'?' below':'');n.style.opacity=p;
+    n.style.left=(r.left-pad)+'px';
+    if(notePos==='below'){n.style.top=(r.bottom+pad+16)+'px';}else{n.style.top=(r.top-pad-60)+'px';}}
+  else if(id==='#hl')$('#note').style.opacity=0;
+}
+
+/* ================= data ================= */
+const SKILLS={
+ all:[
+  {i:'🌐',c:'#e7f5ff',n:'Web Search',d:'联网搜索最新资讯与数据。当你需要"查一下""最近""最新"时触发。',dl:'128.6万',rec:1},
+  {i:'📊',c:'#fff4e6',n:'办公四件套',d:'生成与编辑 Word / Excel / PPT / PDF。涉及文档、表格、演示时触发。',dl:'96.2万',rec:1},
+  {i:'🧭',c:'#f3f0ff',n:'网页操作',d:'自动打开网页、点击、填表、截图。需要操作浏览器时触发。',dl:'87.4万',rec:1},
+  {i:'🎙️',c:'#ebfbee',n:'录音转文字',d:'把会议录音、语音转成带时间轴的文字稿。上传音频时触发。',dl:'65.1万',rec:1},
+  {i:'🎬',c:'#fff0f6',n:'视频下载',d:'解析链接并下载视频到本地。粘贴视频链接时触发。',dl:'52.8万',rec:0},
+  {i:'🛡️',c:'#e6fcf5',n:'技能安全扫描',d:'安装前检查技能包是否含高危操作。安装第三方技能前触发。',dl:'41.3万',rec:1},
+ ],
+ sec:[
+  {i:'🛡️',c:'#e6fcf5',n:'技能安全扫描',d:'安装前检查技能包是否含高危操作、越权访问。安装第三方技能前触发。',dl:'41.3万',rec:1},
+  {i:'🔐',c:'#f3f0ff',n:'代码安全扫描',d:'扫描项目依赖与代码中的常见漏洞，输出修复建议。',dl:'23.7万',rec:1},
+  {i:'🧪',c:'#fff4e6',n:'网站安全体检',d:'检测网站 HTTPS、响应头等常见配置问题。',dl:'9.8万',rec:0},
+  {i:'🕵️',c:'#f1f3f5',n:'极速安全扫描Pro',d:'一键全盘扫描，无需授权，自动修复一切问题！！',dl:'312',rec:0,third:1},
+  {i:'📄',c:'#ebfbee',n:'文件安全检查',d:'检查下载文件是否带宏、脚本等可疑内容。',dl:'6.1万',rec:0},
+  {i:'🧰',c:'#e7f5ff',n:'隐私信息脱敏',d:'识别并遮盖文档里的手机号、身份证等敏感信息。',dl:'12.4万',rec:1},
+ ]
+};
+function renderGrid(list){
+  $('#mk-grid').innerHTML=list.map((s,k)=>`<div class="card" id="cd-${k}">
+    <div class="row"><div class="ico center" style="background:${s.c}">${s.i}</div>
+      <div><div class="nm" id="nm-${k}">${s.n}${s.rec?'<span class="tag rec">推荐</span>':''}${s.third?'<span class="tag third">第三方</span>':''}</div></div></div>
+    <div class="ds" id="ds-${k}">${s.d}</div>
+    <div class="ft"><span id="dl-${k}">⬇ ${s.dl}</span><span>★ ${s.rec?'4.9':'4.1'}</span><div class="btn ${s.rec?'pri':''}" id="ib-${k}">安装</div></div></div>`).join('');
+}
+let gridKey='';
+function setGrid(key,filter){const k=key+(filter||'');if(gridKey===k)return;gridKey=k;let l=SKILLS[key];if(filter==='rec')l=l.filter(s=>s.rec);if(filter==='dl')l=[...l].sort((a,b)=>parse(b.dl)-parse(a.dl));renderGrid(l);}
+const parse=s=>s.endsWith('万')?parseFloat(s)*1e4:parseFloat(s);
+function setInstalled(list){$('#inst-list').innerHTML=list.map(x=>`<div>${x}</div>`).join('');$('#inst-count').textContent=`(${list.length})`;}
+function nav(which){$('#nav-chat').className='it'+(which==='chat'?' on':'');$('#nav-market').className='it'+(which==='market'?' on':'');
+  $('#v-market').style.opacity=which==='market'?1:0;$('#v-chat').style.opacity=which==='chat'?1:0;}
+function resetChat(){$('#ch-msgs').innerHTML='';$('#ch-inp').className='inp';$('#ch-in').innerHTML='<span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span>';}
+function resetAppOverlays(){$('#dd').style.opacity=0;$('#modal').style.opacity=0;$('#slash').style.opacity=0;}
+
+/* ================= timeline ================= */
+// each scene: {el, ch (chapter label), cues:[text or [text,extraHold]], r(t,T)}
+const S=[];
+const scene=(o)=>S.push(o);
+
+scene({el:'#s-intro',ch:'Skill 技能篇',cues:['从零到一，带你把 WorkBuddy 学会。','一期讲透一个功能，每一步都带着你做。'],
+ r(t,T){fadeIn($('#in-pill'),t,.2);fadeIn($('#in-t1'),t,.5,.7,40);fadeIn($('#in-t2'),t,T[1],.6);}});
+
+scene({el:'#s-hook',ch:'开篇',cues:['这期解决新手最懵的问题：<b>Skill 到底是啥？</b>','为什么别人用它像开了挂，','你用起来像在求人？','这期讲透三件事：',['它是什么、怎么挑怎么装、装完怎么用。',.8]],
+ r(t,T){const q=$('#hk-q');fadeIn(q,t,.1);const out=prog(t,T[3],.4);
+   const l=$('#hk-l'),r=$('#hk-r');fadeIn(l,t,T[1],.5,40);fadeIn(r,t,T[2],.5,40);
+   if(out>0){l.style.opacity=1-out;r.style.opacity=1-out;}
+   const th=$('#hk-three');th.style.opacity=prog(t,T[3]+.3,.4);
+   [...th.children].forEach((c,i)=>{const p=eout(prog(t,T[4]+i*.55,.45));c.style.opacity=p;c.style.transform=`scale(${.85+.15*p})`;});
+   q.textContent=t<T[3]?'Skill 到底是啥？':'这期讲透三件事';}});
+
+const chap=(n,title,sub,cues,ch)=>scene({el:'#s-chap',ch,cues,r(t,T){$('#ch-n').textContent=n;$('#ch-t').textContent=title;$('#ch-s').textContent=sub;
+  fadeIn($('#ch-n'),t,.1,.5,30);fadeIn($('#ch-t'),t,.3,.5,30);fadeIn($('#ch-s'),t,.7,.5,20);}});
+
+chap('01','它是什么？','Skill 的本质 · 有它没它差多少',[['一、它是什么？',.4]],'01 它是什么');
+
+scene({el:'#s-book',ch:'01 它是什么',cues:['先给结论：Skill 就是一本<b>「标准动作说明书」</b>。'],
+ r(t,T){fadeIn($('#bk-book'),t,.3,.6,40);document.querySelectorAll('.bks').forEach((e,i)=>fadeIn(e,t,1.0+i*.55,.4,14));}});
+
+// market tour: name + description
+scene({el:'#s-app',ch:'01 它是什么',cues:['打开技能市场你会看到，','每个技能都挂着两样东西：<b>名称</b>和<b>描述</b>——','描述里写清了它是干什么的、什么情况下触发。',['装上它，等于把一套成熟的流程直接塞进 AI 脑子里。',.8]],
+ r(t,T){nav(t<.9?'chat':'market');setGrid('all');resetAppOverlays();resetChat();$('#mk-q').innerHTML='搜索技能名称或用途，如「安全扫描」';$('#mk-q').className='ph';$('#mk-search').className='search';
+   $('#tab-all').className='tab on';$('#tab-rec').className='tab';$('#mk-sort').textContent='排序：综合 ▾';
+   const inst=['联网搜索','查找技能'];const installed=t>=T[3]+1.6;setInstalled(installed?[...inst,'办公四件套']:inst);
+   cursorPath(t,[[0,[1500,700]],[.8,'#nav-market',1],[T[1],'#nm-1',0,40,0],[T[2],'#ds-1',0,120,10],[T[3]+1.2,'#ib-1',1],[T[3]+3,'#ib-1',0,60,60]]);
+   highlight('#hl',t,T[1]+.2,T[2],'#nm-1',8,'名称','above');
+   highlight('#hl2',t,T[1]+.9,T[2],'#ds-1',6);
+   if(t>=T[2]&&t<T[3])highlight('#hl',t,T[2],T[3],'#ds-1',6,'描述：干什么 + 什么时候触发','below');
+   if(t>=T[3])highlight('#hl',t,T[3],T[3]+99,'#cd-1',6,null);
+   const ib=$('#ib-1');if(t>=T[3]+1.6){ib.className='btn ok';ib.textContent='✓ 已安装';}else if(t>=T[3]+1.2){ib.textContent='安装中…';}}});
+
+scene({el:'#s-cmp',ch:'01 它是什么',cues:['有没有 skill，差别有多大？',['没有技能的时候：你每次都要重新交代一遍格式、说一遍要求，',.5],['说得不够细，它就跑偏，<b>重做三遍</b>是常事。',.6],['有了技能：一句话调用，输出稳定，每次都长一个样。',.8],'你把它理解成 AI 的<b>「快捷指令」</b>就对了——',['手机上按一下出结果，这里一句话出结果。',.8]],
+ r(t,T){const L=$('#cmp-l'),R=$('#cmp-r');fadeIn(L,t,.3,.5,30);fadeIn(R,t,.6,.5,30);
+   const out=prog(t,T[4],.4);if(out>0){L.style.opacity=1-out;R.style.opacity=1-out;}
+   const sc=$('#cmp-sc');sc.style.opacity=prog(t,T[4]+.3,.5);
+   const tile=$('#sc-tile');const tp=t>=T[5]+.6&&t<T[5]+.9;tile.style.transform=tp?'scale(.92)':'scale(1)';
+   $('#sc-out').style.opacity=t>=T[4]+.3?(t<T[5]+1.2?.25:1):0;
+   // left chat
+   const lb=[];const a=T[1];
+   if(t>=a)lb.push(`<div class="bub me" style="font-size:17px">帮我写本周周报，分成果、问题、计划三段，标题加粗，数据做成表格，500字以内…</div>`);
+   if(t>=a+2.2)lb.push(`<div class="bub ai" style="font-size:17px">好的！本周工作很充实🎉 我们完成了很多事情……（一大段流水账，没有表格）</div>`);
+   if(t>=T[2])lb.push(`<div class="bub me" style="font-size:17px">不对，要分三段、要表格……</div>`);
+   if(t>=T[2]+1.2)lb.push(`<div class="bub ai" style="font-size:17px">抱歉，已修改：（分了两段，标题又没加粗）</div>`);
+   if(t>=T[2]+2.2)lb.push(`<div style="font-size:24px;font-weight:900;color:var(--bad)">🔁 重做第 ${t>=T[2]+3.2?3:2} 次……</div>`);
+   $('#cmp-l-body').innerHTML=lb.join('');
+   const rb=[];const b=T[3];
+   if(t>=b)rb.push(`<div class="bub me" style="font-size:17px"><span class="chip" style="font-size:16px;background:#fff">/ 周报生成</span> 本周数据</div>`);
+   if(t>=b+1)rb.push(`<div class="bub ai" style="font-size:17px"><b>📄 第 39 周周报</b><br><b>一、成果</b>　上线 2 个功能，转化率 +12%<br><b>二、问题</b>　接口响应偏慢<br><b>三、下周计划</b>　性能优化、灰度发布<br><span style="color:var(--ok)">✓ 格式与上周完全一致</span></div>`);
+   $('#cmp-r-body').innerHTML=rb.join('');
+   highlight('#hl',t,b+2.2,T[4],'#cmp-r',0,null);
+   cursorState=null;}});
+
+chap('02','怎么挑、怎么装？','手动挑 · 自动找',[['二、怎么挑、怎么装？',.4]],'02 怎么挑怎么装');
+
+scene({el:'#s-road',ch:'02 怎么挑怎么装',cues:[['两条路。',.8]],r(t,T){fadeIn($('#rd-title'),t,.1);fadeIn($('#rd-a'),t,.4,.5,40);fadeIn($('#rd-b'),t,.8,.5,40);}});
+
+// manual pick
+scene({el:'#s-app',ch:'02 · 第一条：手动挑',cues:['第一条，<b>手动挑</b>，最稳。','打开技能市场，搜关键词，',['比如你要做安全检查就搜「安全扫描」。',.8],'新手挑技能就看两点：',['优先看<b>「推荐」</b>那一栏，那是官方筛过的；',.6],['再看<b>下载量</b>，下载量高的，经过的人多，更安全。',.8],['装之前多说一句：',1.0]],
+ r(t,T){resetAppOverlays();nav(t<T[1]+.5?'chat':'market');resetChat();setInstalled(['联网搜索','查找技能','办公四件套','技能安全扫描']);
+   const q='安全扫描';const qa=T[1]+1.4;const searched=t>=T[2]+.8;
+   const filter=t>=T[4]+.8?(t>=T[5]+.8?'dl':'rec'):'';
+   setGrid(searched?'sec':'all',searched?filter:'');
+   const s=$('#mk-search'),mq=$('#mk-q');
+   if(t>=T[1]+1.1){s.className='search focus';const tx=typed(q,t,qa,6);mq.className='';mq.innerHTML=tx+(t<T[2]+.8?caret(t):'');}
+   else{s.className='search';mq.className='ph';mq.innerHTML='搜索技能名称或用途，如「安全扫描」';}
+   $('#tab-all').className='tab'+(filter!=='rec'?' on':'');$('#tab-rec').className='tab'+(filter==='rec'?' on':'');
+   $('#mk-sort').textContent=filter==='dl'?'排序：下载量 ▾':'排序：综合 ▾';
+   cursorPath(t,[[0,[1400,600]],[T[1]+.4,'#nav-market',1],[T[1]+1.1,'#mk-search',1,-300,0],[T[4]+.8,'#tab-rec',1],[T[5]+.8,'#mk-sort',1],[T[6],'#cd-5',0,0,40]]);
+   // highlights
+   if(t>=T[3]&&t<T[4])highlight('#hl',t,T[3],T[4],'.tabs',6,'看两点：推荐 + 下载量','below');
+   else if(t>=T[4]&&t<T[5])highlight('#hl',t,T[4]+1.0,T[5],'#tab-rec',6,'官方筛过');
+   else if(t>=T[5]&&t<T[6])highlight('#hl',t,T[5]+1.0,T[6],'#dl-0',6,'下载量高 = 经过的人多');
+   else if(t>=T[6])highlight('#hl',t,T[6]+.3,T[7]+1,'#cd-5',6,'来路不明的第三方技能','above');
+   else highlight('#hl',t,-1,-1,'#hl');
+   highlight('#hl2',t,-1,-1,'#hl2');
+   }});
+
+// scan callout overlay scene (third-party)
+scene({el:'#s-app',ch:'02 · 第一条：手动挑',cues:[['来路不明的第三方技能，先用<b>安全扫描技能</b>过一遍再装。',2.8]],
+ r(t,T){nav('chat');resetAppOverlays();setInstalled(['联网搜索','查找技能','办公四件套','技能安全扫描']);
+   const msgs=[];const cmd='<span class="chip">/ 技能安全扫描</span> 检查「极速安全扫描Pro」';
+   const ci=$('#ch-in'),inp=$('#ch-inp');
+   if(t<2.0){inp.className='inp focus';ci.innerHTML=(t>=.4?'<span class="chip">/ 技能安全扫描</span> '+typed('检查「极速安全扫描Pro」',t,.8,12):'')+caret(t);}
+   else{inp.className='inp';ci.innerHTML='<span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span>';msgs.push(`<div class="bub me">${cmd}</div>`);}
+   if(t>=2.6)msgs.push(`<div class="bub ai"><div class="tool">${t<4?'<div class="sp" style="transform:rotate('+(t*400)+'deg)"></div>':'✅'} 已调用技能：技能安全扫描</div>`+(t>=4?`<b style="color:var(--bad)">⚠️ 发现 2 项高风险</b><br>· 请求删除本地文件的权限<br>· 向未知服务器上传数据<br><b>建议：不要安装。</b>可改用官方推荐的「代码安全扫描」。`:'正在分析技能包…')+`</div>`);
+   $('#ch-msgs').innerHTML=msgs.join('');
+   if(t>=4.4)highlight('#hl',t,4.4,99,'#ch-msgs .bub.ai',6,'装前扫一遍，避开高风险技能','above');else highlight('#hl',t,-1,-1,'#hl');
+   highlight('#hl2',t,-1,-1,'#hl2');
+   cursorPath(t,[[0,[1500,800]],[2,'#ch-inp .send',1],[4,[1600,900]]]);}});
+
+// auto find
+scene({el:'#s-app',ch:'02 · 第二条：自动找',cues:['第二条，<b>自动找</b>，最省事。','右上角<b>「添加技能」</b>，点<b>「查找技能」</b>，',['直接输入你的需求，比如「帮我找个能剪视频的」，',1.0],['它会自己去搜、自己去装。',2.2],'但有个前提：你得先装了「查找技能」这个技能本身——',['它是<b>帮你找技能的技能</b>。',.8]],
+ r(t,T){nav('market');setGrid('all');$('#mk-q').className='ph';$('#mk-q').innerHTML='搜索技能名称或用途，如「安全扫描」';$('#mk-search').className='search';
+   $('#tab-all').className='tab on';$('#tab-rec').className='tab';$('#mk-sort').textContent='排序：综合 ▾';$('#slash').style.opacity=0;
+   const base=['联网搜索','查找技能','办公四件套','技能安全扫描'];
+   const done=t>=T[3]+3.4;setInstalled(done?[...base,'视频剪辑助手']:base);
+   const dd=$('#dd');const ddOn=t>=T[1]+.9&&t<T[1]+2.4;dd.style.opacity=ddOn?1:0;$('#dd-2').className='di'+(t>=T[1]+1.6?' on':'');
+   const md=$('#modal');const mOn=t>=T[1]+2.4&&t<T[4];md.style.opacity=mOn?Math.min(1,(t-T[1]-2.4)/.3):(t>=T[4]?1-prog(t,T[4],.3):0);
+   const need='帮我找个能剪视频的';const tx=typed(need,t,T[2]+.3,7);$('#md-q').innerHTML=tx+(t<T[3]?caret(t):'');$('#md-search').className='search'+(t<T[3]?' focus':'');
+   ['#st1','#st2','#st3','#st4'].forEach((s,i)=>{fadeIn($(s),t,T[3]+i*.9,.35,10);});
+   cursorPath(t,[[0,[1300,600]],[T[1]+.9,'#btn-add',1],[T[1]+1.6,'#dd-2',1],[T[2],[1300,400]],[T[4],[1300,400]],[T[4]+.8,'#inst-list',0,40,0]]);
+   if(t>=T[1]+.3&&t<T[1]+.9)highlight('#hl',t,T[1]+.2,T[1]+.95,'#btn-add',6,'右上角','below');
+   else if(t>=T[4])highlight('#hl',t,T[4]+.4,99,'#inst-list div:nth-child(2)',4,'前提：先装「查找技能」','above');
+   else highlight('#hl',t,-1,-1,'#hl');
+   highlight('#hl2',t,-1,-1,'#hl2');}});
+
+chap('03','装完怎么用？','点名调用 · 直接对话',[['三、装完怎么用？',.4]],'03 装完怎么用');
+scene({el:'#s-road',ch:'03 装完怎么用',cues:[['两种方法。',.8]],r(t,T){
+  $('#rd-a-n').textContent='方法一';$('#rd-a-t').textContent='点名调用';$('#rd-a-tag').textContent='最稳';$('#rd-a-d').textContent='输入 / → 选技能 → 接上需求';
+  $('#rd-b-n').textContent='方法二';$('#rd-b-t').textContent='直接对话';$('#rd-b-tag').textContent='最快';$('#rd-b-d').textContent='自然说话，听懂了自动触发';
+  $('#rd-title').firstElementChild.textContent='两种方法';
+  fadeIn($('#rd-title'),t,.1);fadeIn($('#rd-a'),t,.4,.5,40);fadeIn($('#rd-b'),t,.8,.5,40);}});
+
+const Q='查一下近一周 AI 视频号的爆款选题。';
+const RES=`<ol class="res" style="margin-top:6px"><li>《AI 帮我 10 分钟做完周报》— 点赞 3.2 万</li><li>《普通人用 AI 剪视频的 3 个技巧》— 点赞 2.7 万</li><li>《一句话生成 PPT，老板看呆了》— 点赞 2.1 万</li></ol><div style="font-size:15px;color:var(--ink3);margin-top:6px">来源：联网搜索 · 近 7 天</div>`;
+// method 1
+scene({el:'#s-app',ch:'03 · 方法一：点名调用',cues:['方法一，<b>点名调用</b>，最稳。',['对话框里打个斜杠，技能列表就弹出来了，',.8],'选中你要的，比如 Web Search，',['后面接上需求：「查一下近一周 AI 视频号的爆款选题。」',1.4],['你点名的，它一定用，不会自作主张。',2.0]],
+ r(t,T){nav('chat');$('#dd').style.opacity=0;$('#modal').style.opacity=0;setInstalled(['联网搜索','查找技能','办公四件套','技能安全扫描','视频剪辑助手']);
+   const ci=$('#ch-in'),inp=$('#ch-inp'),sl=$('#slash');
+   const slashAt=T[1]+.9,pick=T[2]+1.4,sendAt=T[3]+Q.length/9+1.2+.5;
+   sl.style.opacity=(t>=slashAt&&t<pick)?1:0;
+   ['#sl-1','#sl-2','#sl-3','#sl-4','#sl-5'].forEach((s,i)=>$(s).className='si'+(i===0&&t>=T[2]+.6?' on':''));
+   let html='';
+   if(t<T[1]+.5){inp.className='inp';html='<span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span>';}
+   else if(t<sendAt){inp.className='inp focus';
+     if(t<pick)html=(t>=slashAt?'/':'')+caret(t);
+     else html='<span class="chip">/ Web Search</span> '+typed(Q,t,T[3]+.2,9)+caret(t);}
+   else{inp.className='inp';html='<span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span>';}
+   ci.innerHTML=html;
+   const msgs=[];if(t>=sendAt)msgs.push(`<div class="bub me"><span class="chip" style="background:#fff">/ Web Search</span> ${Q}</div>`);
+   if(t>=sendAt+.5)msgs.push(`<div class="bub ai" id="ai1"><div class="tool">${t<sendAt+1.6?'<div class="sp" style="transform:rotate('+(t*400)+'deg)"></div>':'✅'} 已调用技能：<b style="color:var(--brand)">Web Search</b>（你点名指定）</div>${t>=sendAt+1.6?RES:''}</div>`);
+   $('#ch-msgs').innerHTML=msgs.join('');
+   cursorPath(t,[[0,[1500,500]],[T[1]+.5,'#ch-inp',1,-300,0],[T[2]+.6,'#sl-1',0],[pick,'#sl-1',1],[sendAt-.1,'#ch-inp .send',1],[sendAt+1,[1600,300]]]);
+   if(t>=T[1]+1.1&&t<pick)highlight('#hl',t,T[1]+1.1,pick,'#slash',4,'打 / 弹出技能列表','above');
+   else if(t>=sendAt+1.7)highlight('#hl',t,sendAt+1.7,99,'#ai1 .tool',4,'点名的，一定用','below');
+   else highlight('#hl',t,-1,-1,'#hl');
+   highlight('#hl2',t,-1,-1,'#hl2');}});
+
+// method 2
+scene({el:'#s-app',ch:'03 · 方法二：直接对话',cues:['方法二，<b>直接对话</b>，最快。','自然说话就行：',['「用 Web Search 帮我查近一周 AI 视频号的爆款选题。」',1.4],['它听懂了就<b>自动触发</b>。',1.6],['听不懂的时候，换回方法一点名。',.6]],
+ r(t,T){nav('chat');$('#slash').style.opacity=0;$('#dd').style.opacity=0;$('#modal').style.opacity=0;
+   const ci=$('#ch-in'),inp=$('#ch-inp');const txt='用 Web Search 帮我查近一周 AI 视频号的爆款选题。';
+   const ta=T[1]+.4,sendAt=T[3]-.2;
+   if(t>=ta&&t<sendAt){inp.className='inp focus';ci.innerHTML=typed(txt,t,ta,10)+caret(t);}else{inp.className='inp';ci.innerHTML='<span class="ph">给 WorkBuddy 发消息，输入 / 调用技能</span>';}
+   const msgs=[];if(t>=sendAt)msgs.push(`<div class="bub me">${txt}</div>`);
+   if(t>=sendAt+.5)msgs.push(`<div class="bub ai" id="ai2"><div class="tool">${t<sendAt+1.6?'<div class="sp" style="transform:rotate('+(t*400)+'deg)"></div>':'✨'} 自动匹配技能：<b style="color:var(--brand)">Web Search</b></div>${t>=sendAt+1.6?RES:''}</div>`);
+   if(t>=T[4]+.3)msgs.push(`<div style="align-self:center;font-size:17px;color:var(--warn);background:var(--warnSoft);padding:8px 16px;border-radius:10px">💡 没触发？输入 / 手动点名技能即可</div>`);
+   $('#ch-msgs').innerHTML=msgs.join('');
+   cursorPath(t,[[0,[1500,500]],[ta-.2,'#ch-inp',1,-200,0],[sendAt-.1,'#ch-inp .send',1],[sendAt+1,[1600,300]]]);
+   if(t>=sendAt+1.7&&t<T[4])highlight('#hl',t,sendAt+1.7,T[4],'#ai2 .tool',4,'听懂了，自动触发','below');else highlight('#hl',t,-1,-1,'#hl');
+   highlight('#hl2',t,-1,-1,'#hl2');}});
+
+scene({el:'#s-mix',ch:'03 装完怎么用',cues:['我的建议是混着用：',['简单任务直接说，复杂任务点名调——',.8],['省事和稳定，你总要占一头，熟练了再都占。',1.0]],
+ r(t,T){fadeIn($('#mx-a'),t,T[1],.5,40);fadeIn($('#mx-b'),t,T[1]+.9,.5,40);}});
+
+const TEN=[['🧭','网页操作'],['📊','办公四件套'],['🎙️','录音转文字'],['🎬','视频下载'],['🌐','联网搜索'],['📒','笔记读写'],['🛡️','技能安全扫描'],['🔁','自我改进'],['🔎','查找技能'],['🎨','网页设计']];
+$('#ls-grid').innerHTML=TEN.map((x,i)=>`<div class="panel ls" style="height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative">
+  <div style="position:absolute;left:16px;top:12px;font-size:20px;font-weight:900;color:var(--ink3)">${String(i+1).padStart(2,'0')}</div>
+  <div style="font-size:56px">${x[0]}</div><div style="font-size:28px;font-weight:700">${x[1]}</div></div>`).join('');
+scene({el:'#s-list',ch:'新手必装清单',cues:[['至于先装哪十个，我报一遍名字，详细的<b>下下期</b>专门讲：',.4],['网页操作、办公四件套、录音转文字、视频下载、联网搜索、',1.2],['笔记读写、技能安全扫描、自我改进、查找技能、网页设计。',1.2],['先把<b>前五个</b>装上，够你应付 80% 的活。',1.6]],
+ r(t,T){const ls=document.querySelectorAll('.ls');ls.forEach((e,i)=>{const a=i<5?T[1]+i*.75:T[2]+(i-5)*.75;const p=eout(prog(t,a,.4));
+     const dim=t>=T[3]&&i>=5;e.style.opacity=p*(dim?.35:1);e.style.transform=`scale(${.8+.2*p})`;
+     e.style.outline=(t>=T[3]+.3&&i<5)?'4px solid #ffb700':'none';});
+   fadeIn($('#ls-tip'),t,T[3]+.5,.5);}});
+
+const PIT=['🌐','📊','🧭','🎙️','🎬','🛡️','📒','🔁','🔎','🎨','📷','📈','🗂️','✉️','🗓️','🎵','🧮','🌍','🖼️','📦','🧾','🔤','💡','🧠','🛒','📌','🗺️','🎯','🔔','🧩'];
+$('#pit-grid').innerHTML=PIT.map((x,i)=>`<div class="center pit" style="height:92px;border-radius:14px;background:#f4f5fa;border:1px solid var(--line);font-size:40px">${x}</div>`).join('');
+scene({el:'#s-pit',ch:'避坑',cues:['最大的一个坑：技能<b>在精不在多</b>。','别一口气装三十个，',['每个技能都占资源、都可能互相干扰，',.6],['先把三五个用熟，缺什么补什么。',1.4]],
+ r(t,T){const ps=document.querySelectorAll('.pit');const shrink=prog(t,T[3]+.3,1.0);const n=Math.round(30-25*shrink);
+   $('#pit-n').textContent=n;$('#pit-n').style.color=n<=5?'var(--ok)':'var(--bad)';
+   const st=$('#pit-st');if(n<=5){st.textContent='✅ 用熟了，缺什么再补';st.style.background='var(--okSoft)';st.style.color='var(--ok)';}else{st.textContent='⚠️ 占资源 · 互相干扰';st.style.background='var(--badSoft)';st.style.color='var(--bad)';}
+   st.style.opacity=t>=T[2]?1:0;
+   ps.forEach((e,i)=>{const a=T[1]+i*.05;let o=prog(t,a,.25);if(i>=5)o*=1-shrink;e.style.opacity=o;
+     const shake=(t>=T[2]&&t<T[3]&&i>=5)?Math.sin(t*40+i)*3:0;e.style.transform=`translateX(${shake}px)`;
+     e.style.borderColor=(t>=T[2]&&t<T[3]+.3)?'#ffc9c9':(i<5&&shrink>0?'#b2f2bb':'var(--line)');});}});
+
+scene({el:'#s-next',ch:'下期预告',cues:['下期讲让任务自己跑：<b>自动化</b>，','解放双手就学这个。',['想跟着做，评论区扣个<b>「教程」</b>，',1.2],['我把新手必装清单发给你。',2.2]],
+ r(t,T){fadeIn($('#nx-card'),t,.2,.6,40);fadeIn($('#nx-cmt'),t,T[2],.5,30);
+   $('#nx-in').innerHTML=typed('教程',t,T[2]+.8,3)+(t<T[3]+.6?caret(t):'');
+   fadeIn($('#nx-reply'),t,T[3]+.8,.5,10);}});
+
+/* ---- build absolute timeline ---- */
+const CPS=6, BASE=.7, GAP=.15;
+const plain=s=>s.replace(/<[^>]+>/g,'');
+let cursorT=0;const CUES=[];
+for(const sc of S){
+  sc.start=cursorT;sc.T=[];let lt=0;
+  for(const c of sc.cues){const [txt,hold]=Array.isArray(c)?c:[c,0];const n=[...plain(txt)].length;
+    const d=Math.max(2.0,BASE+n/CPS)+hold;sc.T.push(lt);CUES.push({s:cursorT+lt,e:cursorT+lt+d-GAP,txt});lt+=d;}
+  sc.T.push(lt);sc.dur=lt+.4;cursorT+=sc.dur;
+}
+const TOTAL=cursorT+1.2;
+window.TOTAL=TOTAL;window.CUES=CUES.map(c=>({s:c.s,e:c.e,text:plain(c.txt)}));
+
+/* ---- render ---- */
+const XF=.35; // crossfade
+function render(t){
+  let cur=S.findIndex(s=>t>=s.start&&t<s.start+s.dur);if(cur<0)cur=S.length-1;
+  const sc=S[cur];const lt=t-sc.start;
+  document.querySelectorAll('.scene').forEach(e=>{e.style.opacity=0;});
+  cursorState=null;
+  const el=$(sc.el);
+  // fade in / out of scene; scenes sharing same element skip the fade
+  const prev=S[cur-1],next=S[cur+1];
+  let o=1;
+  if(!(prev&&prev.el===sc.el))o=Math.min(o,eout(clamp(lt/XF)));
+  if(!(next&&next.el===sc.el))o=Math.min(o,clamp((sc.dur-lt)/XF));
+  if(cur===S.length-1)o=Math.min(1,eout(clamp(lt/XF)))*clamp((TOTAL-t)/.8);
+  el.style.opacity=o;
+  highlight('#hl',lt,-1,-1,'#hl');highlight('#hl2',lt,-1,-1,'#hl2');
+  sc.r(lt,sc.T);
+  $('#hl').style.opacity=parseFloat($('#hl').style.opacity||0)*o;$('#note').style.opacity=parseFloat($('#note').style.opacity||0)*o;$('#hl2').style.opacity=parseFloat($('#hl2').style.opacity||0)*o;
+  // cursor
+  const cu=$('#cursor'),rp=$('#ripple');
+  if(cursorState){cu.style.opacity=o;cu.style.transform=`translate(${cursorState.x-6}px,${cursorState.y-4}px)`;
+    if(cursorState.click){const c=cursorState.click;rp.style.opacity=(1-c.p)*o;rp.style.transform=`translate(${c.x-40}px,${c.y-40}px) scale(${.3+c.p})`;}else rp.style.opacity=0;}
+  else{cu.style.opacity=0;rp.style.opacity=0;}
+  // chapter + progress
+  $('#chapter').textContent=sc.ch;$('#progress').style.width=(t/TOTAL*1920)+'px';
+  // subtitle
+  const cue=CUES.find(c=>t>=c.s&&t<c.e);const sp=$('#sub span');
+  if(cue){sp.innerHTML=cue.txt;sp.style.opacity=1;}else{sp.style.opacity=0;}
+}
+window.render=render;
+window.warm=async()=>{for(let t=0;t<TOTAL;t+=.5)render(t);await document.fonts.ready;render(0);return TOTAL;};
+render(0);
+</script>
+</body>
+</html>

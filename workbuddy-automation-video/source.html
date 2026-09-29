@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>WorkBuddy 自动化教程</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/900.css">
+<style>
+:root{
+  --bg:#eef0fa; --ink:#1d2033; --ink2:#5a5f7a; --ink3:#9a9fb8; --line:#e4e6f0;
+  --brand:#5b5bf6; --brand2:#8b5cf6; --brandSoft:#eeeefe; --ok:#16a36a; --okSoft:#e6f7ef;
+  --warn:#e8590c; --warnSoft:#fff1e7; --bad:#e03131; --badSoft:#ffecec; --gold:#ffb700;
+  --c1:#5b5bf6; --c2:#0ca678; --c3:#f08c00; --c4:#e64980;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#0f1020}
+body{font-family:'Noto Sans SC','WenQuanYi Zen Hei',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#f6f5ff 0%,#eaeefb 55%,#dfe5f7 100%);perspective:2200px;perspective-origin:50% 45%}
+/* background 3D */
+#floor{position:absolute;left:-1500px;right:-1500px;top:560px;height:1800px;transform-origin:50% 0;transform:rotateX(78deg);
+  background-image:linear-gradient(rgba(91,91,246,.22) 2px,transparent 2px),linear-gradient(90deg,rgba(91,91,246,.22) 2px,transparent 2px);background-size:120px 120px;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 75%);mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 75%)}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+.pt{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+#world{position:absolute;inset:0;transform-style:preserve-3d}
+.scene{position:absolute;inset:0;opacity:0;transform-style:preserve-3d}
+.abs{position:absolute}
+.center{display:flex;align-items:center;justify-content:center}
+.p3{transform-style:preserve-3d}
+
+#s-app{transform-style:flat}
+#badge{position:absolute;left:36px;top:26px;z-index:40;background:rgba(255,255,255,.88);padding:8px 12px 8px 8px;border-radius:18px;box-shadow:0 6px 20px rgba(40,40,110,.12);display:flex;gap:12px;align-items:center}
+#badge .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:900;font-size:22px}
+#badge .t{font-size:22px;font-weight:700}
+#badge .c{font-size:20px;color:var(--brand);background:#fff;border:1px solid var(--line);padding:6px 16px;border-radius:99px;font-weight:500}
+#progress{position:absolute;left:0;top:0;height:6px;background:linear-gradient(90deg,var(--brand),var(--brand2));z-index:60}
+#cursor{position:absolute;z-index:45;width:40px;height:40px;left:0;top:0;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+#ripple{position:absolute;z-index:44;width:80px;height:80px;border-radius:50%;border:4px solid var(--brand);opacity:0}
+
+.h1{font-size:88px;font-weight:900;letter-spacing:2px}
+.h2{font-size:64px;font-weight:900}
+.grad{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.panel{background:#fff;border-radius:24px;box-shadow:0 30px 70px rgba(40,40,110,.18),0 0 0 1px rgba(40,40,110,.05)}
+.pill{display:inline-block;padding:10px 26px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:26px;color:var(--ink2)}
+.tag{display:inline-block;padding:6px 16px;border-radius:10px;font-weight:700;font-size:24px}
+.ext{text-shadow:0 1px 0 #c9c9ff,0 2px 0 #bdbdfb,0 3px 0 #b1b1f7,0 4px 0 #a5a5f3,0 5px 0 #9999ef,0 14px 24px rgba(60,60,160,.35)}
+
+/* app window */
+.win{position:absolute;left:150px;top:112px;width:1620px;height:800px;background:#fff;border-radius:18px;
+  box-shadow:0 50px 120px rgba(40,40,110,.30),0 0 0 1px rgba(30,30,60,.06);overflow:hidden;will-change:transform}
+.win .bar{height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:10px;background:#fafbfe}
+.win .dot{width:14px;height:14px;border-radius:50%}
+.win .bar .ttl{margin-left:18px;font-size:18px;font-weight:700}
+.side{position:absolute;left:0;top:52px;bottom:0;width:230px;background:#f8f9fd;border-right:1px solid var(--line);padding:18px 14px}
+.side .it{display:flex;align-items:center;gap:12px;font-size:18px;color:var(--ink2);padding:12px 14px;border-radius:10px;margin-bottom:4px}
+.side .it.on{background:var(--brandSoft);color:var(--brand);font-weight:700}
+.main{position:absolute;left:230px;top:52px;right:0;bottom:0}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;font-size:17px;font-weight:500;padding:9px 18px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.glow{box-shadow:0 0 0 4px var(--gold),0 0 40px rgba(255,183,0,.55)!important}
+
+/* automation list */
+.tk{display:flex;align-items:center;gap:18px;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:14px;background:#fff}
+.tk .ic{width:52px;height:52px;border-radius:14px;font-size:26px;flex:none}
+.tk .n{font-size:20px;font-weight:700}.tk .d{font-size:15px;color:var(--ink3);margin-top:2px}
+.st{font-size:15px;padding:5px 12px;border-radius:99px;font-weight:700;margin-left:auto}
+.st.on{background:var(--okSoft);color:var(--ok)}.st.off{background:#f1f2f6;color:var(--ink3)}.st.run{background:var(--brandSoft);color:var(--brand)}
+.sw{width:50px;height:28px;border-radius:99px;background:#d6d8e4;position:relative;flex:none}
+.sw:after{content:'';position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on{background:var(--ok)}.sw.on:after{left:25px}
+
+/* form */
+#v-form{position:absolute;inset:0;padding:20px 34px}
+.fh{display:flex;align-items:center;gap:18px}
+.fh .t{font-size:26px;font-weight:900}
+.stepper{display:flex;gap:8px;margin-left:auto}
+.sp{font-size:15px;padding:6px 12px;border-radius:99px;background:#f2f3f8;color:var(--ink3);font-weight:500}
+.sp.on{background:var(--brand);color:#fff}.sp.done{background:var(--okSoft);color:var(--ok)}
+.cols{display:flex;gap:26px;margin-top:18px}
+.col{display:flex;flex-direction:column;gap:14px}
+.fld{border:1px solid var(--line);border-radius:14px;padding:14px 18px;background:#fff;position:relative}
+.fld .lb{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.fld .lb .n{width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-size:14px}
+.fld .hint{font-size:13.5px;color:var(--ink3);margin-top:2px}
+.in{margin-top:10px;height:48px;border:2px solid var(--line);border-radius:10px;display:flex;align-items:center;padding:0 14px;font-size:18px;gap:8px}
+.in.focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,246,.12)}
+.ph{color:var(--ink3)}
+.caret{display:inline-block;width:2px;height:22px;background:var(--brand);vertical-align:middle;margin-left:1px}
+.ta{margin-top:10px;height:236px;border:2px solid var(--line);border-radius:10px;padding:12px 14px;font-size:21px;line-height:1.75}
+.ta.focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,246,.12)}
+.seg{display:inline-flex;background:#f2f3f8;border-radius:10px;padding:4px;gap:4px}
+.seg div{font-size:16px;padding:6px 16px;border-radius:8px;color:var(--ink2)}
+.seg div.on{background:#fff;color:var(--brand);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--brandSoft);color:var(--brand);border:1px solid #cfd0fd;border-radius:8px;padding:4px 10px;font-weight:700;font-size:15px}
+.rad{display:flex;align-items:center;gap:8px;font-size:16px}
+.rad i{width:18px;height:18px;border-radius:50%;border:2px solid #c3c6d6;display:inline-block;position:relative}
+.rad i.on{border-color:var(--brand)}.rad i.on:after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--brand)}
+.hl-when{background:rgba(91,91,246,.18);box-shadow:0 -3px 0 var(--c1) inset;border-radius:4px}
+.hl-count{background:rgba(12,166,120,.18);box-shadow:0 -3px 0 var(--c2) inset;border-radius:4px}
+.hl-fmt{background:rgba(240,140,0,.18);box-shadow:0 -3px 0 var(--c3) inset;border-radius:4px}
+.hl-where{background:rgba(230,73,128,.18);box-shadow:0 -3px 0 var(--c4) inset;border-radius:4px}
+.pop{position:absolute;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(30,30,80,.2);padding:8px;z-index:5;opacity:0}
+.pop .r{padding:9px 12px;border-radius:8px;font-size:16px;display:flex;gap:8px;align-items:center}
+.pop .r.on{background:var(--brandSoft);color:var(--brand);font-weight:700}
+
+/* callouts (screen space, 3D) */
+.co{position:absolute;z-index:30;opacity:0;background:#fff;border-radius:18px;padding:20px 26px;box-shadow:0 30px 70px rgba(30,30,90,.28),0 0 0 1px rgba(30,30,90,.06);font-size:24px;line-height:1.6}
+.co .k{font-size:17px;color:var(--brand);font-weight:700;letter-spacing:1px}
+.co.dark{background:#1d2033;color:#fff}
+.co.gold{background:#fff8e6;border:3px solid var(--gold)}
+.phone{position:absolute;width:300px;height:600px;border-radius:44px;background:#1d2033;padding:14px;box-shadow:0 40px 80px rgba(0,0,0,.35)}
+.phone .scr{width:100%;height:100%;border-radius:32px;background:linear-gradient(180deg,#c9d6ff,#e2e2ff);overflow:hidden;position:relative}
+.notif{position:absolute;left:12px;right:12px;top:60px;background:rgba(255,255,255,.92);border-radius:18px;padding:12px 14px;font-size:14px;line-height:1.5;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:14px}
+.cal div{height:120px;border-radius:16px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;color:var(--ink2);gap:6px}
+.cal b{font-size:38px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="floor"></div>
+  <div class="orb" id="orb1" style="width:700px;height:700px;background:#c7c3ff;left:-150px;top:-200px"></div>
+  <div class="orb" id="orb2" style="width:600px;height:600px;background:#b9e3ff;right:-120px;top:300px"></div>
+  <div class="orb" id="orb3" style="width:500px;height:500px;background:#ffd6f0;left:700px;top:700px"></div>
+  <div id="pts"></div>
+  <div id="progress"></div>
+  <div id="badge"><div class="logo center">W</div><div class="t">WorkBuddy 从零到一</div><div class="c" id="chapter">第 3 期 · 自动化</div></div>
+
+<div id="world">
+  <!-- intro -->
+  <div class="scene" id="s-intro">
+    <div class="abs center p3" style="inset:0;flex-direction:column;gap:34px;padding-bottom:80px">
+      <div class="pill" id="in-pill">新手系列 · 第 3 期</div>
+      <div class="h1" id="in-t1">从零到一，带你把 <span class="grad">WorkBuddy</span> 学会</div>
+      <div id="in-t2" style="font-size:40px;color:var(--ink2);font-weight:500">一期讲透一个功能，每一步都带着你做</div>
+      <div id="in-t3" class="panel center" style="margin-top:20px;padding:22px 44px;gap:18px;font-size:44px;font-weight:900"><span style="font-size:54px">⚙️</span>本期：<span class="grad">自动化</span></div>
+    </div>
+  </div>
+
+  <!-- hook -->
+  <div class="scene" id="s-hook">
+    <div class="abs p3" id="hk-eps" style="left:0;right:0;top:230px;height:420px">
+      <div class="panel abs hk-ep" style="left:300px;width:400px;height:300px;padding:34px"><div style="font-size:22px;color:var(--ink3)">第 1 期</div><div style="font-size:40px;font-weight:900;margin-top:10px">认界面</div><div class="tag" style="margin-top:22px;background:var(--okSoft);color:var(--ok)">✓ 已学会</div></div>
+      <div class="panel abs hk-ep" style="left:760px;width:400px;height:300px;padding:34px"><div style="font-size:22px;color:var(--ink3)">第 2 期</div><div style="font-size:40px;font-weight:900;margin-top:10px">装技能</div><div class="tag" style="margin-top:22px;background:var(--okSoft);color:var(--ok)">✓ 已学会</div></div>
+      <div class="panel abs hk-ep" style="left:1220px;width:400px;height:300px;padding:34px;border:3px solid var(--brand)"><div style="font-size:22px;color:var(--brand)">第 3 期 · 本期</div><div style="font-size:40px;font-weight:900;margin-top:10px">让 AI 按时上岗</div><div class="tag" style="margin-top:22px;background:var(--brandSoft);color:var(--brand)">🧑‍💼 你只当验收人</div></div>
+    </div>
+    <div class="abs center" id="hk-gap" style="left:0;right:0;top:170px;flex-direction:column;gap:40px;opacity:0">
+      <div class="h2">拉开差距的，不是 <span style="color:var(--ink3)">做一次</span>，而是 <span class="grad">一直做</span></div>
+      <svg width="1300" height="480" viewBox="0 0 1300 480" id="hk-chart">
+        <line x1="80" y1="420" x2="1260" y2="420" stroke="#c9ccdf" stroke-width="3"/>
+        <line x1="80" y1="40" x2="80" y2="420" stroke="#c9ccdf" stroke-width="3"/>
+        <text x="1250" y="460" font-size="24" fill="#9a9fb8" text-anchor="end">时间 →</text>
+        <text x="96" y="60" font-size="24" fill="#9a9fb8">累计产出</text>
+        <path id="hk-once" d="M80 420 L260 330 L1260 330" fill="none" stroke="#adb2c9" stroke-width="8" stroke-linecap="round" stroke-dasharray="1400" stroke-dashoffset="1400"/>
+        <path id="hk-keep" d="M80 420 L1260 60" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" stroke-dasharray="1300" stroke-dashoffset="1300"/>
+        <defs><linearGradient id="g1"><stop offset="0" stop-color="#5b5bf6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+        <text id="hk-once-t" x="1000" y="310" font-size="30" font-weight="700" fill="#9a9fb8" opacity="0">让 AI 做一次</text>
+        <text id="hk-keep-t" x="880" y="130" font-size="34" font-weight="900" fill="#5b5bf6" opacity="0">让 AI 一直做</text>
+      </svg>
+    </div>
+    <div class="abs" id="hk-life" style="left:0;right:0;top:0;bottom:0;opacity:0">
+      <div class="abs center" style="left:0;right:0;top:140px"><div class="h2">两种人生</div></div>
+      <div class="panel abs" id="hk-l" style="left:190px;top:270px;width:740px;height:600px;padding:34px">
+        <div style="font-size:30px;font-weight:900;color:var(--bad)">😩 天天手动喊它</div>
+        <div id="hk-l-body" style="margin-top:22px;display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+      <div class="panel abs" id="hk-r" style="left:990px;top:270px;width:740px;height:600px;padding:34px">
+        <div style="font-size:30px;font-weight:900;color:var(--ok)">😎 到点自动收货</div>
+        <div id="hk-r-body" style="margin-top:22px;display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- chapter -->
+  <div class="scene" id="s-chap">
+    <div class="abs center p3" style="inset:0;flex-direction:column;gap:18px;padding-bottom:100px">
+      <div id="ch-n" style="font-size:190px;font-weight:900;line-height:1" class="grad">01</div>
+      <div id="ch-t" class="h1 ext">自动化是什么？</div>
+      <div id="ch-s" style="font-size:34px;color:var(--ink2)"></div>
+      <div id="ch-extra" class="p3" style="margin-top:30px;display:flex;gap:16px"></div>
+    </div>
+  </div>
+
+  <!-- definition -->
+  <div class="scene" id="s-def">
+    <div class="abs center" style="left:0;right:0;top:140px"><div class="h2" id="df-t">一句话</div></div>
+    <div class="abs p3" style="left:0;right:0;top:300px;height:520px">
+      <div class="abs" id="df-left" style="left:230px;top:40px;width:460px;height:420px"></div>
+      <div class="abs center" id="df-gear" style="left:810px;top:120px;width:300px;height:300px;font-size:190px">⚙️</div>
+      <div class="abs panel center" id="df-right" style="left:1230px;top:90px;width:460px;height:340px;flex-direction:column;gap:14px;opacity:0">
+        <div style="font-size:110px">☕</div><div style="font-size:38px;font-weight:900">不用管的活</div><div style="font-size:22px;color:var(--ink3)">到点自动跑，结果自己送到</div>
+      </div>
+      <div class="abs center" style="left:230px;top:470px;width:460px;font-size:32px;font-weight:900;color:var(--ink2)" id="df-lt">手上的重复活</div>
+    </div>
+  </div>
+
+  <!-- types -->
+  <div class="scene" id="s-types">
+    <div class="abs center" style="left:0;right:0;top:140px"><div class="h2">它分 <span class="grad">两种</span></div></div>
+    <div class="abs panel" id="ty-a" style="left:220px;top:280px;width:700px;height:560px;padding:40px">
+      <div class="tag" style="background:var(--warnSoft);color:var(--warn)">一次性提醒</div>
+      <div style="font-size:26px;color:var(--ink2);margin-top:16px">到点触发 <b style="color:var(--ink)">一次</b></div>
+      <div class="p3" style="margin-top:26px;display:flex;gap:26px;align-items:center">
+        <div id="ty-cal" style="width:230px;height:250px;border-radius:22px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.12);border:1px solid var(--line)">
+          <div style="background:var(--warn);color:#fff;font-size:26px;font-weight:700;padding:12px;text-align:center">周五</div>
+          <div class="center" style="height:190px;flex-direction:column;background:#fff"><div style="font-size:72px;font-weight:900">15:00</div><div style="font-size:20px;color:var(--ink3)">下午三点</div></div>
+        </div>
+        <div id="ty-bell" style="font-size:100px">🔔</div>
+      </div>
+      <div id="ty-a-msg" class="panel" style="margin-top:26px;padding:16px 22px;font-size:22px;border:2px solid var(--warn);opacity:0">🔔 提醒：该交周报啦</div>
+    </div>
+    <div class="abs panel" id="ty-b" style="left:1000px;top:280px;width:700px;height:560px;padding:40px">
+      <div class="tag" style="background:var(--brandSoft);color:var(--brand)">循环任务</div>
+      <div style="font-size:26px;color:var(--ink2);margin-top:16px">每天 / 每周 / 每月 <b style="color:var(--ink)">固定跑</b></div>
+      <div class="abs" style="left:170px;top:190px;width:360px;height:360px">
+        <svg width="360" height="360" viewBox="0 0 360 360" style="position:absolute;inset:0">
+          <circle cx="180" cy="180" r="140" fill="none" stroke="#e4e6f0" stroke-width="18"/>
+          <circle id="ty-ring" cx="180" cy="180" r="140" fill="none" stroke="url(#g2)" stroke-width="18" stroke-linecap="round" stroke-dasharray="880" stroke-dashoffset="880" transform="rotate(-90 180 180)"/>
+          <defs><linearGradient id="g2"><stop offset="0" stop-color="#5b5bf6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+        </svg>
+        <div class="abs center" style="inset:0;flex-direction:column"><div style="font-size:64px;font-weight:900">08:00</div><div style="font-size:22px;color:var(--ink3)">每天早上</div><div id="ty-news" style="margin-top:8px;font-size:22px;color:var(--brand);font-weight:700">📰 自动整理新闻</div></div>
+        <div id="ty-dot" class="abs" style="width:34px;height:34px;border-radius:50%;background:var(--brand2);box-shadow:0 0 20px rgba(139,92,246,.6)"></div>
+      </div>
+      <div id="ty-count" class="abs" style="right:40px;top:40px;font-size:22px;font-weight:700;color:var(--brand)"></div>
+    </div>
+  </div>
+
+  <!-- core: trigger + flow -->
+  <div class="scene" id="s-core">
+    <div class="abs center" style="left:0;right:0;top:140px"><div class="h2">核心就两个零件</div></div>
+    <div class="abs panel p3" id="co-a" style="left:210px;top:320px;width:560px;height:440px;padding:40px">
+      <div style="font-size:90px">⏰</div>
+      <div style="font-size:44px;font-weight:900;margin-top:10px">触发器</div>
+      <div style="font-size:26px;color:var(--ink2);margin-top:10px">什么时候动</div>
+      <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap"><span class="chip" style="font-size:18px">周五 15:00</span><span class="chip" style="font-size:18px">每天 08:00</span><span class="chip" style="font-size:18px">每月 1 号</span></div>
+    </div>
+    <div class="abs center" id="co-plus" style="left:790px;top:470px;width:120px;height:120px;font-size:100px;font-weight:900;color:var(--brand)">+</div>
+    <div class="abs panel p3" id="co-b" style="left:930px;top:320px;width:780px;height:440px;padding:40px">
+      <div style="font-size:90px">🔗</div>
+      <div style="font-size:44px;font-weight:900;margin-top:10px">任务流</div>
+      <div style="font-size:26px;color:var(--ink2);margin-top:10px">动起来干什么</div>
+      <div style="margin-top:28px;display:flex;align-items:center;gap:12px;font-size:21px" id="co-flow">
+        <div class="fl panel center" style="padding:14px 18px;border-radius:14px">🔎 搜热点</div><div class="fa">→</div>
+        <div class="fl panel center" style="padding:14px 18px;border-radius:14px">🧹 整理排序</div><div class="fa">→</div>
+        <div class="fl panel center" style="padding:14px 18px;border-radius:14px">📄 存成文档</div><div class="fa">→</div>
+        <div class="fl panel center" style="padding:14px 18px;border-radius:14px">📲 推送</div>
+      </div>
+    </div>
+    <div class="abs center" id="co-eq" style="left:0;right:0;top:820px;opacity:0"><div class="pill" style="font-size:32px;color:var(--ink);font-weight:700">⏰ 触发器 + 🔗 任务流 = <span class="grad">自动化</span></div></div>
+  </div>
+
+  <!-- APP -->
+  <div class="scene" id="s-app">
+    <div class="win" id="win">
+      <div class="bar">
+        <div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div class="ttl">WorkBuddy</div>
+        <div style="margin-left:auto" class="center"><div class="center" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffd6a5,#fdffb6);font-size:18px">🙂</div></div>
+      </div>
+      <div class="side">
+        <div class="it"><span>💬</span>新对话</div>
+        <div class="it"><span>🧩</span>技能市场</div>
+        <div class="it on" id="nav-auto"><span>⚙️</span>自动化</div>
+        <div class="it"><span>📁</span>我的文件</div>
+      </div>
+      <div class="main">
+        <div id="v-list" class="abs" style="inset:0;padding:26px 40px">
+          <div style="display:flex;align-items:center"><div><div style="font-size:30px;font-weight:900">自动化</div><div style="font-size:16px;color:var(--ink3);margin-top:4px">让 AI 按时上岗：设好触发时间和任务，到点自动执行</div></div>
+            <div class="btn pri" id="btn-new" style="margin-left:auto;font-size:18px;padding:12px 22px">＋ 新建任务</div></div>
+          <div style="margin-top:26px" id="tk-list">
+            <div class="tk" id="tk-new" style="opacity:0"><div class="ic center" style="background:var(--brandSoft)">📰</div><div><div class="n">每日AI热点晨报</div><div class="d">循环 · 每天 08:00 · 推送到微信 · 工作空间 AI热点</div></div><div class="st on" id="tk-new-st">● 已启用</div><div class="sw on"></div></div>
+            <div class="tk"><div class="ic center" style="background:var(--warnSoft)">🔔</div><div><div class="n">交周报提醒</div><div class="d">一次性 · 周五 15:00</div></div><div class="st off">待触发</div><div class="sw on"></div></div>
+            <div class="tk"><div class="ic center" style="background:var(--okSoft)">📊</div><div><div class="n">月度数据汇总</div><div class="d">循环 · 每月 1 号 09:00</div></div><div class="st off">已暂停</div><div class="sw"></div></div>
+          </div>
+        </div>
+        <div id="v-form" style="opacity:0">
+          <div class="fh"><div class="t">新建自动化任务</div>
+            <div class="stepper" id="stepper"><div class="sp">① 名称</div><div class="sp">② 工作空间</div><div class="sp">③ 提示词</div><div class="sp">④ 模型与技能</div><div class="sp">⑤ 频率</div><div class="sp">⑥ 推送与测试</div></div></div>
+          <div class="cols">
+            <div class="col" style="width:680px">
+              <div class="fld" id="f-name"><div class="lb"><span class="n center">1</span>任务名称</div>
+                <div class="in" id="in-name"><span class="ph">例如：每日AI热点晨报</span></div></div>
+              <div class="fld" id="f-ws"><div class="lb"><span class="n center">2</span>工作空间</div><div class="hint">文件放哪、素材从哪来，任务产出都归到这里</div>
+                <div class="in" id="in-ws"><span>📁</span><span id="ws-v" class="ph">选择文件夹</span><span class="btn" style="margin-left:auto;padding:4px 12px;font-size:15px">选择</span></div>
+                <div class="pop" id="ws-pop" style="left:18px;top:112px;width:360px">
+                  <div class="r">📁 WorkBuddy</div><div class="r" style="padding-left:34px">📁 周报</div><div class="r" id="ws-ai" style="padding-left:34px">📁 AI热点</div><div class="r" style="padding-left:34px">📁 素材</div></div></div>
+              <div class="fld" id="f-prompt"><div class="lb"><span class="n center">3</span>提示词 <span style="font-size:13px;color:var(--warn);background:var(--warnSoft);padding:2px 8px;border-radius:6px">关键</span></div>
+                <div class="hint">自动化没有聊天上下文，请把 时间 / 数量 / 格式 / 存放位置 写全</div>
+                <div class="ta" id="ta"><span class="ph">描述这个任务每次要做什么…</span></div></div>
+            </div>
+            <div class="col" style="width:626px">
+              <div class="fld" id="f-model"><div class="lb"><span class="n center">4</span>模型与技能</div>
+                <div style="display:flex;gap:10px;align-items:center;margin-top:10px"><div class="in" style="margin:0;width:220px;font-size:16px">🧠 默认模型 <span style="margin-left:auto">▾</span></div>
+                  <div id="sk" style="display:flex;gap:8px"><span class="chip" id="sk1" style="opacity:.25">🌐 联网搜索</span><span class="chip" id="sk2" style="opacity:.25">📊 办公四件套</span></div></div>
+                <div style="display:flex;gap:26px;margin-top:14px" id="perm"><div class="rad" id="pm-def"><i class="on"></i>默认权限 <span style="font-size:13px;color:var(--ok)">推荐</span></div><div class="rad" id="pm-full"><i></i>完全访问 <span style="font-size:13px;color:var(--bad)">⚠ 敏感</span></div></div>
+                <div class="pop" id="pm-tip" style="left:230px;top:140px;width:360px;padding:14px 16px;font-size:15px;line-height:1.6;background:#fff4f4;border-color:#ffc9c9"><b style="color:var(--bad)">⚠ 完全访问</b><br>可删除、修改本地文件。涉及删除文件等敏感操作时，务必慎重开启。</div></div>
+              <div class="fld" id="f-freq"><div class="lb"><span class="n center">5</span>执行频率</div>
+                <div style="display:flex;gap:12px;align-items:center;margin-top:10px"><div class="seg" id="seg"><div>一次</div><div>每天</div><div>每周</div><div>每月</div></div>
+                  <div class="in" style="margin:0;width:110px;font-size:17px" id="in-time">⏰ 08:00</div></div>
+                <div id="freq-x" style="margin-top:10px;font-size:15px;color:var(--ink2);height:30px;display:flex;gap:6px;align-items:center"></div>
+                <div style="font-size:14px;color:var(--ink3);margin-top:4px" id="tz">🌏 时区：UTC+8 北京时间</div></div>
+              <div class="fld" id="f-push"><div class="lb"><span class="n center">6</span>推送与测试</div>
+                <div style="display:flex;gap:26px;margin-top:12px;font-size:17px;align-items:center"><div style="display:flex;gap:8px;align-items:center"><div class="sw" id="sw-wx"></div>微信</div><div style="display:flex;gap:8px;align-items:center"><div class="sw" id="sw-wk"></div>企业微信</div></div>
+                <div style="display:flex;gap:10px;margin-top:14px;align-items:center"><div class="btn" id="btn-test" style="border-color:var(--brand);color:var(--brand)">▶ 测试运行</div><div class="btn pri" id="btn-save">保存并启用</div>
+                  <div class="st off" id="run-st">未运行</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- callouts -->
+    <div class="co" id="co-name" style="left:1180px;top:640px;width:560px"></div>
+    <div class="co" id="co-ctx" style="left:1170px;top:170px;width:600px"></div>
+    <div class="co" id="co-legend" style="left:150px;top:820px;width:1620px;padding:16px 24px"></div>
+    <div class="co" id="co-misc" style="left:1250px;top:700px;width:520px"></div>
+    <div class="phone" id="phone" style="left:1530px;top:300px;opacity:0"><div class="scr">
+      <div style="text-align:center;font-size:48px;font-weight:300;color:#fff;margin-top:120px">08:00</div>
+      <div class="notif" id="notif" style="top:230px"><div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#555"><span class="center" style="width:22px;height:22px;border-radius:6px;background:#2dbd5a;color:#fff;font-size:12px">✓</span>微信 · WorkBuddy 自动化<span style="margin-left:auto">现在</span></div>
+        <div style="font-weight:700;margin-top:6px">每日AI热点晨报 已完成</div><div style="color:#555">5 条热点已按热度排序，存入 AI热点/今日热点.docx</div></div>
+    </div></div>
+  </div>
+
+  <!-- test warn -->
+  <div class="scene" id="s-test">
+    <div class="abs center" style="left:0;right:0;top:130px"><div class="h2">测试这一步，<span style="color:var(--bad)">别跳过</span></div></div>
+    <div class="abs panel" id="tw-a" style="left:200px;top:280px;width:560px;height:560px;padding:40px">
+      <div class="tag" style="background:var(--okSoft);color:var(--ok)">✅ 上线前</div>
+      <div style="font-size:30px;font-weight:900;margin-top:18px">测试时多跑一次</div>
+      <div class="center" id="tw-test" style="margin-top:40px;height:260px;border-radius:22px;background:var(--okSoft);flex-direction:column;gap:10px"><div style="font-size:90px">🧪</div><div style="font-size:26px;color:var(--ok);font-weight:700">花 1 分钟</div></div>
+    </div>
+    <div class="abs panel" id="tw-b" style="left:820px;top:280px;width:900px;height:560px;padding:40px">
+      <div class="tag" style="background:var(--badSoft);color:var(--bad)">❌ 不测试直接上线</div>
+      <div style="font-size:30px;font-weight:900;margin-top:18px">连续跑错一周</div>
+      <div class="cal" id="tw-cal" style="margin-top:40px"></div>
+      <div id="tw-sum" style="margin-top:30px;font-size:26px;color:var(--bad);font-weight:700;opacity:0">7 份错误的晨报，全推到了你的微信里</div>
+    </div>
+  </div>
+
+  <!-- pits carousel -->
+  <div class="scene" id="s-pits">
+    <div class="abs center" style="left:0;right:0;top:120px"><div class="h2">三个坑，<span style="color:var(--bad)">提前说</span></div></div>
+    <div class="abs p3" id="pit-ring" style="left:960px;top:560px;width:0;height:0">
+      <!-- pit 1 -->
+      <div class="panel abs pitc" id="pc1" style="left:-460px;top:-310px;width:920px;height:620px;padding:40px">
+        <div class="tag" style="background:var(--badSoft);color:var(--bad)">坑一</div>
+        <div style="font-size:44px;font-weight:900;margin-top:14px">提示词写不全</div>
+        <div style="display:flex;gap:24px;margin-top:30px">
+          <div style="flex:1"><div style="font-size:19px;color:var(--ink3)">你写的</div><div class="panel" style="margin-top:8px;padding:18px;font-size:26px;box-shadow:none;border:2px solid var(--line)">"整理一下新闻"</div>
+            <div style="font-size:19px;color:var(--ink3);margin-top:18px">它心里的问号</div><div id="p1q" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;font-size:20px"></div></div>
+          <div style="flex:1"><div style="font-size:19px;color:var(--ink3)">它交出来的</div><div id="p1o" class="panel" style="margin-top:8px;padding:18px;font-size:19px;line-height:1.7;color:var(--ink2);box-shadow:none;border:2px dashed #ffc9c9;opacity:0">📄 体育新闻 20 条，无链接，<br>乱序，只显示在对话里，<br>明天早上已经找不到了……</div></div>
+        </div>
+        <div id="p1s" style="margin-top:26px;font-size:30px;font-weight:900;opacity:0">你省的字 = <span style="color:var(--bad)">它犯的错</span></div>
+      </div>
+      <!-- pit 2 -->
+      <div class="panel abs pitc" id="pc2" style="left:-460px;top:-310px;width:920px;height:620px;padding:40px">
+        <div class="tag" style="background:var(--badSoft);color:var(--bad)">坑二</div>
+        <div style="font-size:44px;font-weight:900;margin-top:14px">不核对时区</div>
+        <div style="display:flex;gap:40px;margin-top:30px;align-items:center">
+          <div id="p2night" class="center" style="width:300px;height:300px;border-radius:32px;background:linear-gradient(160deg,#1d2033,#3b3f6b);flex-direction:column;gap:6px;color:#fff">
+            <div style="font-size:70px">🌙</div><div style="font-size:64px;font-weight:900">00:00</div><div id="p2buzz" style="font-size:22px;color:#ffd43b">📳 叮！推送来了</div></div>
+          <div style="flex:1">
+            <div class="panel" style="padding:16px 20px;box-shadow:none;border:2px solid var(--line);font-size:22px" id="p2a">🌏 时区：<b>UTC+0 伦敦</b><div style="font-size:18px;color:var(--ink3)">设定 08:00 → 北京时间 16:00</div></div>
+            <div class="panel" style="margin-top:14px;padding:16px 20px;box-shadow:none;border:2px solid var(--line);font-size:22px" id="p2b">🌏 时区：<b>UTC-8 洛杉矶</b><div style="font-size:18px;color:var(--ink3)">设定 16:00 → 北京时间 <b style="color:var(--bad)">00:00</b></div></div>
+            <div class="panel" style="margin-top:14px;padding:16px 20px;box-shadow:none;border:3px solid var(--ok);font-size:22px;opacity:0" id="p2c">✅ 核对为 <b>UTC+8 北京时间</b></div>
+          </div>
+        </div>
+      </div>
+      <!-- pit 3 -->
+      <div class="panel abs pitc" id="pc3" style="left:-460px;top:-310px;width:920px;height:620px;padding:40px">
+        <div class="tag" style="background:var(--badSoft);color:var(--bad)">坑三</div>
+        <div style="font-size:44px;font-weight:900;margin-top:14px">任务不拆</div>
+        <div id="p3big" class="panel" style="margin-top:26px;padding:22px;box-shadow:none;border:2px solid var(--line)">
+          <div style="font-size:18px;color:var(--ink3)">一个大任务</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:22px">
+            <div class="panel center p3n" style="padding:14px 18px;box-shadow:none;border:2px solid var(--line)">🔎 查资料</div><div>→</div>
+            <div class="panel center p3n" id="p3mid" style="padding:14px 18px;box-shadow:none;border:2px solid var(--line)">📊 做表</div><div>→</div>
+            <div class="panel center p3n" style="padding:14px 18px;box-shadow:none;border:2px solid var(--line)">✉️ 发邮件</div>
+            <div id="p3stuck" style="margin-left:auto;font-size:22px;color:var(--bad);font-weight:900;opacity:0">⛔ 全卡住</div>
+          </div>
+        </div>
+        <div id="p3split" style="margin-top:22px;opacity:0">
+          <div style="font-size:18px;color:var(--ink3)">拆成三个任务，排着跑</div>
+          <div style="display:flex;gap:14px;margin-top:10px">
+            <div class="panel p3s" style="flex:1;padding:16px;box-shadow:none;border:2px solid #b2f2bb;font-size:20px"><b>任务 A</b> 🔎 查资料<div style="font-size:16px;color:var(--ink3)">每天 08:00</div></div>
+            <div class="panel p3s" style="flex:1;padding:16px;box-shadow:none;border:2px solid #b2f2bb;font-size:20px"><b>任务 B</b> 📊 做表<div style="font-size:16px;color:var(--ink3)">每天 08:20</div></div>
+            <div class="panel p3s" style="flex:1;padding:16px;box-shadow:none;border:2px solid #b2f2bb;font-size:20px"><b>任务 C</b> ✉️ 发邮件<div style="font-size:16px;color:var(--ink3)">每天 08:40</div></div>
+          </div>
+          <div style="margin-top:14px;font-size:24px;font-weight:900">一个任务只干一件事</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- rules -->
+  <div class="scene" id="s-rules">
+    <div class="abs center" style="left:0;right:0;top:120px"><div class="h2">五条黄金法则 · <span class="grad">口诀</span></div></div>
+    <div class="abs p3" id="rl-row" style="left:110px;right:110px;top:290px;height:600px;display:flex;gap:26px"></div>
+  </div>
+
+  <!-- laptop truth -->
+  <div class="scene" id="s-lap">
+    <div class="abs center" style="left:0;right:0;top:130px"><div class="h2">补一句<span style="color:var(--warn)">大实话</span></div></div>
+    <div class="abs p3" id="lap" style="left:560px;top:330px;width:800px;height:560px">
+      <div class="abs p3" id="lap-base" style="left:0;top:470px;width:800px;height:500px;transform-origin:50% 0;transform:rotateX(82deg);background:linear-gradient(#d9dce8,#c4c8d8);border-radius:20px"></div>
+      <div class="abs p3" id="lap-lid" style="left:40px;top:0;width:720px;height:470px;transform-origin:50% 100%;background:#2b2e45;border-radius:22px 22px 6px 6px;padding:18px">
+        <div id="lap-scr" style="width:100%;height:100%;border-radius:10px;background:#fff;overflow:hidden;position:relative;padding:22px">
+          <div style="font-size:20px;font-weight:900">⚙️ 自动化 · 运行中</div>
+          <div class="tk" style="margin-top:14px;padding:12px 16px"><div class="ic center" style="width:40px;height:40px;font-size:20px;background:var(--brandSoft)">📰</div><div><div class="n" style="font-size:17px">每日AI热点晨报</div><div class="d">下次运行 明天 08:00</div></div><div class="st" id="lap-st">● 运行中</div></div>
+          <div id="lap-sleep" class="abs center" style="inset:0;background:#15172a;color:#fff;flex-direction:column;gap:12px;opacity:0"><div style="font-size:70px">💤</div><div style="font-size:26px;font-weight:700">睡眠中 · 任务无法执行</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="co gold" id="lap-co" style="left:1330px;top:420px;width:470px"></div>
+    <div class="co" id="lap-co2" style="left:120px;top:420px;width:430px"></div>
+  </div>
+
+  <!-- value -->
+  <div class="scene" id="s-val">
+    <div class="abs center" style="left:0;right:0;top:130px"><div class="h2">跑起来之后，三个感受</div></div>
+    <div class="abs p3" style="left:150px;right:150px;top:290px;height:560px;display:flex;gap:40px">
+      <div class="panel vc" style="flex:1;padding:40px"><div style="font-size:90px">🧠</div><div style="font-size:48px;font-weight:900;margin-top:12px">省脑子</div><div style="font-size:24px;color:var(--ink2);margin-top:12px;line-height:1.7">到点自动跑<br>你不用惦记</div>
+        <div class="center" style="margin-top:26px;gap:10px;font-size:22px;color:var(--brand);font-weight:700" id="v1">⏰ 08:00 ✓　⏰ 08:00 ✓</div></div>
+      <div class="panel vc" style="flex:1;padding:40px"><div style="font-size:90px">🛡️</div><div style="font-size:48px;font-weight:900;margin-top:12px">保稳定</div><div style="font-size:24px;color:var(--ink2);margin-top:12px;line-height:1.7">流程固定<br>输出质量不飘</div>
+        <svg width="400" height="90" style="margin-top:20px" id="v2"><polyline points="0,45 400,45" stroke="#16a36a" stroke-width="6" fill="none" stroke-dasharray="400" stroke-dashoffset="400" id="v2l"/></svg></div>
+      <div class="panel vc" style="flex:1;padding:40px"><div style="font-size:90px">📈</div><div style="font-size:48px;font-weight:900;margin-top:12px">可积累</div><div style="font-size:24px;color:var(--ink2);margin-top:12px;line-height:1.7">数据越攒越多<br>越用越聪明</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;height:110px;margin-top:10px" id="v3"></div></div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div class="scene" id="s-next">
+    <div class="abs panel" id="nx-card" style="left:180px;top:190px;width:1000px;height:330px;padding:44px 50px">
+      <div style="font-size:26px;color:var(--brand);font-weight:700">下期预告</div>
+      <div style="font-size:60px;font-weight:900;margin-top:8px">把这套东西装进手机</div>
+      <div style="font-size:34px;color:var(--ink2);margin-top:14px">📱 搭一个自己的 <b class="grad">工作台</b></div>
+    </div>
+    <div class="phone p3" id="nx-phone" style="left:1320px;top:170px"><div class="scr" style="background:linear-gradient(180deg,#eef0ff,#fff);padding:50px 18px 18px">
+      <div style="font-size:20px;font-weight:900">我的工作台</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <div style="height:90px;border-radius:14px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);padding:10px;font-size:13px">📰 今日热点<br><b style="font-size:20px">5 条</b></div>
+        <div style="height:90px;border-radius:14px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);padding:10px;font-size:13px">⚙️ 自动化<br><b style="font-size:20px">3 个</b></div>
+        <div style="height:90px;border-radius:14px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);padding:10px;font-size:13px">🔔 提醒<br><b style="font-size:20px">周五</b></div>
+        <div style="height:90px;border-radius:14px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);padding:10px;font-size:13px">📊 月报<br><b style="font-size:20px">1 号</b></div>
+      </div>
+      <div style="margin-top:12px;height:150px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:14px;font-size:14px">▶ 一键运行任务<br><br><b style="font-size:18px">随时随地，手机遥控</b></div>
+    </div></div>
+    <div class="abs panel" id="nx-cmt" style="left:180px;top:570px;width:1000px;height:300px;padding:34px 44px;opacity:0">
+      <div style="font-size:24px;font-weight:700;color:var(--ink2)">💬 评论区</div>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:22px">
+        <div class="center" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#a5d8ff,#d0bfff);font-size:28px">🙋</div>
+        <div id="nx-in" style="flex:1;height:70px;border:2px solid var(--brand);border-radius:14px;padding:0 22px;display:flex;align-items:center;font-size:30px"></div>
+        <div class="btn pri" style="font-size:22px;padding:14px 28px">发送</div>
+      </div>
+      <div id="nx-reply" style="margin-top:22px;font-size:24px;color:var(--ok);font-weight:700;opacity:0">📩 已私信你：自动化模板 + 提示词范例</div>
+    </div>
+  </div>
+</div>
+
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22.5 L15.5 21 L12 14 L19 14 Z" fill="#fff" stroke="#111" stroke-width="1.5" stroke-linejoin="round"/></svg>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eout=x=>1-Math.pow(1-x,3);
+const eback=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
+const prog=(t,a,d=.5)=>clamp((t-a)/d);
+const lerp=(a,b,p)=>a+(b-a)*p;
+// 3D entrance: rises from depth with tilt
+function in3d(el,t,a,d=.7,o={}){const p=clamp((t-a)/d);const e=eback(p);const z=o.z??-500,ry=o.ry??0,rx=o.rx??18,y=o.y??60;
+  el.style.opacity=clamp(p*1.6);el.style.transform=`translate3d(0,${(1-e)*y}px,${(1-e)*z}px) rotateX(${(1-e)*rx}deg) rotateY(${(1-e)*ry}deg)`+(o.extra||'');return p;}
+function flip(el,t,a,d=.7){const p=eout(clamp((t-a)/d));el.style.opacity=clamp(p*2);el.style.transform=`perspective(1400px) rotateY(${(1-p)*-90}deg)`;return p;}
+const typed=(s,t,a,cps=11)=>[...s].slice(0,Math.floor(Math.max(0,t-a)*cps)).join('');
+const caret=t=>(Math.floor(t*2)%2===0)?'<span class="caret"></span>':'<span class="caret" style="opacity:0"></span>';
+window.MISSING=new Set();
+function rectOf(sel){const e=typeof sel==='string'?$(sel):sel;if(!e){MISSING.add(sel);return{left:960,top:540,width:0,height:0};}return e.getBoundingClientRect();}
+function centerOf(sel,dx=0,dy=0){const r=rectOf(sel);return[r.left+r.width/2+dx,r.top+r.height/2+dy];}
+let cursorState=null;
+function cursorPath(t,kf){
+  const pts=kf.map(k=>{const p=typeof k[1]==='string'?centerOf(k[1],k[3]||0,k[4]||0):k[1];return{t:k[0],x:p[0],y:p[1],c:k[2]};});
+  let x=pts[0].x,y=pts[0].y;
+  for(let i=0;i<pts.length;i++){if(t>=pts[i].t){x=pts[i].x;y=pts[i].y;}
+    if(i<pts.length-1&&t>=pts[i].t&&t<pts[i+1].t){const mv=Math.min(.7,pts[i+1].t-pts[i].t),s=pts[i+1].t-mv;
+      if(t>=s){const p=ease((t-s)/mv);x=lerp(pts[i].x,pts[i+1].x,p);y=lerp(pts[i].y,pts[i+1].y,p);}}}
+  let click=null;for(const p of pts)if(p.c&&t>=p.t&&t<p.t+.45)click={x:p.x,y:p.y,p:(t-p.t)/.45};
+  cursorState={x,y,click};}
+
+/* ---- app camera ---- */
+const WIN={l:150,t:112,w:1620,h:800};
+function localCenter(sel){const win=$('#win');let e=$(sel);if(!e){MISSING.add(sel);return[810,400];}
+  let x=e.offsetWidth/2,y=e.offsetHeight/2;while(e&&e!==win){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent;}return[x,y];}
+// kf: [time, sel|null, scale, rx, ry, screenX, screenY]
+function camera(t,kf,gt){
+  const P=kf.map(k=>{const c=k[1]?localCenter(k[1]):[810,400];return{t:k[0],fx:c[0],fy:c[1],s:k[2]??1,rx:k[3]??0,ry:k[4]??0,sx:k[5]??960,sy:k[6]??(k[1]?520:512)};});
+  let cur={...P[0]};
+  for(let i=0;i<P.length;i++){if(t>=P[i].t)cur={...P[i]};
+    if(i<P.length-1&&t>=P[i].t&&t<P[i+1].t){const mv=Math.min(1.1,P[i+1].t-P[i].t),s=P[i+1].t-mv;
+      if(t>=s){const p=ease((t-s)/mv);for(const k of['fx','fy','s','rx','ry','sx','sy'])cur[k]=lerp(P[i][k],P[i+1][k],p);}}}
+  const sway=Math.sin(gt*.5)*1.2,swx=Math.cos(gt*.4)*.8;
+  const w=$('#win');w.style.transformOrigin=`${cur.fx}px ${cur.fy}px`;
+  w.style.transform=`translate(${cur.sx-(WIN.l+cur.fx)}px,${cur.sy-(WIN.t+cur.fy)}px) perspective(2400px) rotateX(${cur.rx+swx}deg) rotateY(${cur.ry+sway}deg) scale(${cur.s})`;
+}
+function glow(sel,on){const e=$(sel);if(e)e.classList.toggle('glow',!!on);}
+function coShow(id,t,a,b,html,o={}){const e=$(id);if(t<a||t>=b){e.style.opacity=0;return;}if(html!==undefined)e.innerHTML=html;
+  const p=eout(prog(t,a,.55)),q=1-prog(t,b-.35,.35);e.style.opacity=p*q;
+  e.style.transform=`perspective(1200px) translate3d(${(1-p)*(o.dx??80)}px,${(1-p)*(o.dy??0)}px,${(1-p)*-300}px) rotateY(${(1-p)*(o.ry??-25)+(o.ry0??-6)}deg)`;}
+
+/* ---- scenes ---- */
+const S=[];const scene=o=>S.push(o);
+
+scene({el:'#s-intro',ch:'第 3 期 · 自动化',cues:['从零到一，带你把 WorkBuddy 学会。',['一期讲透一个功能，每一步都带着你做。',1.2]],
+ r(t,T){in3d($('#in-pill'),t,.1);in3d($('#in-t1'),t,.35,.9,{z:-900,rx:30});in3d($('#in-t2'),t,T[1],.7);in3d($('#in-t3'),t,T[1]+1.4,.8,{z:-700,rx:-40});}});
+
+scene({el:'#s-hook',ch:'开篇',cues:['前两期学了认界面、装技能，',['这期让 AI 按时上岗，你只当验收人。',.8],'因为拉开效率差距的，从来不是让 AI 做一次，',['而是让它一直做。',1.0],'你天天手动喊它整理热点，','和自己到点自动收货，',['是两种人生。',1.4]],
+ r(t,T){
+  const eps=$$('.hk-ep');const epOut=prog(t,T[2]-.2,.5);
+  eps.forEach((e,i)=>{const a=i<2?.2+i*.35:T[1];const p=eback(clamp((t-a)/.8));
+    const front=i===2?eout(prog(t,T[1]+.6,.6)):0;
+    e.style.opacity=clamp(p*2)*(1-epOut);
+    e.style.transform=`translate3d(0,${(1-p)*80+epOut*-60}px,${(1-p)*-600+front*140-epOut*600}px) rotateY(${(1-p)*(i-1)*-30+(i<2?front*12:0)}deg) scale(${i<2?1-front*.06:1})`;
+    if(i<2)e.style.filter=`blur(${front*2}px)`;});
+  const g=$('#hk-gap');const gp=prog(t,T[2],.5),gout=prog(t,T[4]-.3,.5);g.style.opacity=gp*(1-gout);g.style.transform=`translateZ(${(1-gp)*-400+gout*300}px)`;
+  $('#hk-once').style.strokeDashoffset=1400*(1-eout(prog(t,T[2]+.6,1.4)));$('#hk-once-t').style.opacity=prog(t,T[2]+1.8,.5);
+  $('#hk-keep').style.strokeDashoffset=1300*(1-eout(prog(t,T[3],1.6)));$('#hk-keep-t').style.opacity=prog(t,T[3]+1.2,.5);
+  const lf=$('#hk-life');lf.style.opacity=prog(t,T[4],.5);
+  in3d($('#hk-l'),t,T[4],.8,{ry:30,z:-600});in3d($('#hk-r'),t,T[5],.8,{ry:-30,z:-600});
+  const L=[];for(let d=0;d<4;d++){const a=T[4]+.8+d*.9;if(t>=a)L.push(`<div class="panel" style="padding:12px 18px;box-shadow:none;border:1px solid var(--line);font-size:20px;display:flex;gap:12px;align-items:center"><span style="color:var(--ink3)">第 ${d+1} 天 09:${['40','15','52','30'][d]}</span><span class="chip" style="background:#fff">你</span>“帮我整理一下今天的热点…”</div>`);}
+  if(t>=T[6]+.2)L.push(`<div style="font-size:24px;color:var(--bad);font-weight:900;margin-top:6px">🔁 天天记着、天天喊</div>`);
+  $('#hk-l-body').innerHTML=L.join('');
+  const R=[];for(let d=0;d<4;d++){const a=T[5]+.8+d*.6;if(t>=a)R.push(`<div class="panel" style="padding:12px 18px;box-shadow:none;border:1px solid #b2f2bb;background:#f4fcf7;font-size:20px;display:flex;gap:12px;align-items:center"><span style="color:var(--ink3)">第 ${d+1} 天 08:00</span>📦 热点晨报已送达 <span style="margin-left:auto;color:var(--ok)">✓</span></div>`);}
+  if(t>=T[6]+.2)R.push(`<div style="font-size:24px;color:var(--ok);font-weight:900;margin-top:6px">☕ 你只负责验收</div>`);
+  $('#hk-r-body').innerHTML=R.join('');
+  const sc=eout(prog(t,T[6],.6));$('#hk-l').style.filter=`grayscale(${sc*.6})`;
+  $('#hk-r').style.boxShadow=sc>0?`0 30px 70px rgba(40,40,110,.18),0 0 0 ${sc*4}px var(--ok)`:'';
+ }});
+
+const chap=(n,title,sub,cues,ch,extra)=>scene({el:'#s-chap',ch,cues,r(t,T){$('#ch-n').textContent=n;$('#ch-t').textContent=title;$('#ch-s').textContent=sub;
+  const n1=$('#ch-n');const p=eback(clamp(t/1.0));n1.style.opacity=clamp(p*2);n1.style.transform=`translateZ(${(1-p)*-900}px) rotateY(${(1-p)*120}deg)`;
+  in3d($('#ch-t'),t,.35,.8,{rx:70,z:-300});in3d($('#ch-s'),t,.8,.6);
+  const ex=$('#ch-extra');ex.innerHTML=extra||'';$$('#ch-extra > *').forEach((e,i)=>in3d(e,t,1.1+i*.22,.7,{rx:80,z:-200,y:40}));}});
+
+chap('01','自动化是什么？','重复活 → 不用管的活',[['一、自动化是什么？',.6]],'01 自动化是什么');
+
+scene({el:'#s-def',ch:'01 自动化是什么',cues:['一句话：',['把你手上的重复活，变成不用管的活。',2.4]],
+ r(t,T){const L=$('#df-left');const items=['📰 每天整理热点','📊 每周汇总数据','🔔 按时提醒交周报','📁 定期归档文件','✉️ 固定发日报'];
+  const conv=prog(t,T[1]+.6,2.4);
+  L.innerHTML=items.map((x,i)=>{const st=i*.16;const pi=clamp((conv-st)/.35);const e=ease(pi);
+    const x0=0,y0=i*78,x1=650,y1=160;
+    const op=clamp(prog(t,.2+i*.12,.4))*(1-clamp((pi-.7)/.3));
+    return `<div class="panel" style="position:absolute;left:0;top:0;width:420px;padding:16px 22px;font-size:24px;font-weight:700;opacity:${op};transform:translate3d(${lerp(x0,x1,e)}px,${lerp(y0,y1,e)}px,${Math.sin(e*Math.PI)*260}px) rotateY(${e*-40}deg) scale(${1-e*.5})">${x}</div>`;}).join('');
+  const gp=eout(prog(t,.4,.6));const g=$('#df-gear');g.style.opacity=gp;g.style.transform=`translateZ(${(1-gp)*-500}px) rotate(${t*(conv>0&&conv<1?160:30)}deg)`;
+  const r=$('#df-right');in3d(r,t,T[1]+2.4,.9,{ry:-40,z:-600});
+  $('#df-lt').style.opacity=prog(t,.3,.4)*(1-conv);$('#df-t').textContent=t<T[1]?'一句话':'重复活 → 不用管的活';}});
+
+scene({el:'#s-types',ch:'01 自动化是什么',cues:['它分两种：','一种叫一次性提醒——',['比如“周五下午三点提醒我交周报”，到点触发一次；',1.2],'一种叫循环任务——',['每天、每周、每月固定跑，比如每天早上八点自动整理新闻。',1.6]],
+ r(t,T){flip($('#ty-a'),t,T[1]-.3,.8);flip($('#ty-b'),t,T[3]-.3,.8);
+  const a=$('#ty-a'),b=$('#ty-b');
+  const fa=t>=T[3]?eout(prog(t,T[3],.6)):0;a.style.transform+=` translateZ(${-fa*120}px)`;a.style.filter=`saturate(${1-fa*.5})`;
+  const ring=T[2]+2.0;const bell=$('#ty-bell');const sh=(t>=ring&&t<ring+1.2)?Math.sin(t*50)*14:0;bell.style.transform=`rotate(${sh}deg)`;
+  in3d($('#ty-a-msg'),t,ring+.2,.6,{rx:60});
+  const cal=$('#ty-cal');cal.style.transform=`perspective(800px) rotateY(${-14+Math.sin(t)*4}deg)`;
+  const rp=prog(t,T[4],3.2);const loops=rp*3;const frac=loops%1;
+  $('#ty-ring').style.strokeDashoffset=880*(1-(rp>=1?1:frac));
+  const ang=(-90+360*(rp>=1?1:frac))*Math.PI/180;const d=$('#ty-dot');d.style.left=(180+140*Math.cos(ang)-17)+'px';d.style.top=(180+140*Math.sin(ang)-17)+'px';d.style.opacity=t>=T[4]?1:0;
+  const lbl=['每天','每周','每月'];$('#ty-count').textContent=t>=T[4]?`🔁 ${lbl[Math.min(2,Math.floor(loops))]}`:'';}});
+
+scene({el:'#s-core',ch:'01 自动化是什么',cues:['不管是哪种，核心都是两个零件：',['触发器（什么时候动）',1.0],['加任务流（动起来干什么）。',2.0]],
+ r(t,T){in3d($('#co-a'),t,T[1],.9,{ry:50,z:-700});in3d($('#co-b'),t,T[2],.9,{ry:-50,z:-700});
+  const pl=$('#co-plus');const pp=eback(prog(t,T[2]+.4,.6));pl.style.opacity=clamp(pp);pl.style.transform=`scale(${pp}) rotate(${(1-pp)*180}deg)`;
+  $$('#co-flow .fl').forEach((e,i)=>in3d(e,t,T[2]+.9+i*.3,.5,{rx:70,z:-200,y:20}));$$('#co-flow .fa').forEach((e,i)=>e.style.opacity=prog(t,T[2]+1.1+i*.3,.3));
+  const snap=eout(prog(t,T[2]+2.4,.6));$('#co-a').style.transform+=` translateX(${snap*30}px)`;$('#co-b').style.transform+=` translateX(${snap*-30}px)`;
+  in3d($('#co-eq'),t,T[2]+2.6,.6,{rx:60});}});
+
+const STEPS=6;
+function stepper(n){$$('#stepper .sp').forEach((e,i)=>e.className='sp'+(i+1===n?' on':i+1<n?' done':''));
+  ['#f-name','#f-ws','#f-prompt','#f-model','#f-freq','#f-push'].forEach((s,i)=>{const e=$(s);e.style.opacity=(n===0||i+1===n)?1:.55;});}
+chap('02','怎么设置？','六步走',[['二、怎么设置？六步走。',2.2]],'02 怎么设置',
+  ['① 起名字','② 选工作空间','③ 写提示词','④ 模型与技能','⑤ 设频率','⑥ 推送 + 测试'].map((x,i)=>`<div class="panel" style="padding:14px 22px;font-size:24px;font-weight:700;border-radius:16px;${i===2?'border:3px solid var(--warn)':''}">${x}</div>`).join(''));
+
+/* form state */
+const PROMPT=[['每天早上八点','when'],['，整理',''],['五条 AI 行业的热点新闻','count'],['，',''],['每条附原文链接，按热度排序','fmt'],['，',''],['存成一个文档','where'],['。','']];
+const PLEN=PROMPT.reduce((a,s)=>a+[...s[0]].length,0);
+function promptHTML(n,hl){let out='',k=n;for(const[s,c]of PROMPT){const ch=[...s];const take=ch.slice(0,Math.max(0,Math.min(ch.length,k))).join('');k-=ch.length;if(!take)break;
+  out+=(c&&hl[c])?`<span class="hl-${c}">${take}</span>`:take;}return out;}
+function formState(st){ // st: {name, ws, wsPop, prompt(n), hl, skills, full, tip, freq, freqX, wx, wk, run, active}
+  $('#in-name').innerHTML=st.name??'<span class="ph">例如：每日AI热点晨报</span>';$('#in-name').className='in'+(st.active==='name'?' focus':'');
+  $('#ws-v').textContent=st.ws||'选择文件夹';$('#ws-v').className=st.ws?'':'ph';$('#in-ws').className='in'+(st.active==='ws'?' focus':'');
+  $('#ws-pop').style.opacity=st.wsPop?1:0;$('#ws-ai').className='r'+(st.wsSel?' on':'');
+  const ta=$('#ta');ta.className='ta'+(st.active==='prompt'?' focus':'');ta.innerHTML=st.prompt===undefined?'<span class="ph">描述这个任务每次要做什么…</span>':promptHTML(st.prompt,st.hl||{})+(st.active==='prompt'&&st.prompt<PLEN?st.caret:'');
+  $('#sk1').style.opacity=st.skills>=1?1:.25;$('#sk2').style.opacity=st.skills>=2?1:.25;
+  $('#pm-full i').className=st.full?'on':'';$('#pm-def i').className=st.full?'':'on';$('#pm-tip').style.opacity=st.tip?1:0;
+  $$('#seg div').forEach((e,i)=>e.className=i===st.freq?'on':'');
+  $('#freq-x').innerHTML=st.freqX||'';
+  $('#sw-wx').className='sw'+(st.wx?' on':'');$('#sw-wk').className='sw'+(st.wk?' on':'');
+  const rs=$('#run-st');rs.className='st '+(st.run==='ok'?'on':st.run==='run'?'run':'off');rs.innerHTML=st.run==='ok'?'✓ 已触发':st.run==='run'?'⟳ 运行中…':'未运行';
+  ['#f-name','#f-ws','#f-prompt','#f-model','#f-freq','#f-push','#btn-test','#run-st','#tz','#pm-full','#in-name'].forEach(s=>glow(s,false));
+}
+const BASE_ST={name:'每日AI热点晨报',ws:'~/WorkBuddy/AI热点',prompt:PLEN,hl:{},skills:2,freq:1,wx:true,wk:false,run:'none'};
+function appCommon(){$('#v-list').style.opacity=0;$('#v-form').style.opacity=1;$('#phone').style.opacity=0;['#co-name','#co-ctx','#co-legend','#co-misc'].forEach(s=>$(s).style.opacity=0);}
+
+// step 1 (includes list -> new form)
+scene({el:'#s-app',ch:'02 · 第一步：起名字',cues:[['第一步，给任务起名字。',1.8],'别小看这步，名字起清楚，',['三个月后你还能看懂它是干嘛的。',1.4]],
+ r(t,T){appCommon();const fo=prog(t,1.6,.7);const lv=$('#v-list'),fv=$('#v-form');
+  lv.style.opacity=1-fo;lv.style.transform=`translateX(${-fo*120}px)`;fv.style.opacity=fo;fv.style.transform=`perspective(1600px) rotateY(${(1-eout(fo))*25}deg) translateZ(${(1-eout(fo))*-300}px)`;$('#tk-new').style.opacity=0;
+  stepper(t<1.6?0:1);
+  const nm='每日AI热点晨报';const ta=T[1]-.2;
+  formState({active:t>=2.4?'name':null,name:t>=ta?typed(nm,t,ta,6)+(t<T[2]+1?caret(t):''):undefined,run:'none',freq:1});
+  if(t>=T[2]+.2)glow('#in-name',true);
+  camera(t,[[0,null,1,8,-10],[1.6,null,1,4,-6],[2.6,'#f-name',1.75,4,-10,900,420],[T[2]+3,'#f-name',1.75,4,-10,900,420]],t);
+  const bad=`<div class="k">名字起清楚</div><div style="display:flex;gap:18px;align-items:center;margin-top:6px"><div style="color:var(--bad);text-decoration:line-through;font-size:26px">任务1</div><div style="font-size:26px">→</div><div style="font-weight:900;font-size:28px;color:var(--ok)">每日AI热点晨报</div></div>`;
+  coShow('#co-name',t,T[1]+.3,99,T[2]<=t?bad+`<div style="margin-top:10px;font-size:22px;color:var(--ink2)">📅 三个月后打开，一眼看懂：<b>每天</b>做什么、做的是<b>AI 热点</b></div>`:bad);
+  cursorPath(t,[[0,[1500,700]],[1.2,'#btn-new',1],[2.4,'#in-name',1,120,0],[T[2]+2,'#in-name',0,260,40]]);}});
+
+scene({el:'#s-app',ch:'02 · 第二步：工作空间',cues:['第二步，选工作空间。',['告诉它文件放哪、素材从哪来，',.8],['任务产出的东西都归到这个文件夹。',1.4]],
+ r(t,T){appCommon();stepper(2);const sel=T[1]+1.4;
+  formState({name:'每日AI热点晨报',active:'ws',ws:t>=sel+.3?'~/WorkBuddy/AI热点':'',wsPop:t>=T[0]+1.4&&t<sel+.3,wsSel:t>=sel-.4,run:'none',freq:1});
+  camera(t,[[0,'#f-name',1.75,4,-10,900,420],[.9,'#f-ws',1.6,6,8,960,420],[T[3],'#f-ws',1.6,6,8,960,420]],t);
+  coShow('#co-misc',t,T[2],99,`<div class="k">📁 AI热点 /</div><div style="font-size:21px;line-height:1.9;margin-top:6px">📄 今日热点.docx <span style="color:var(--ok);font-size:16px">← 任务产出</span><br>🖼️ 素材 / 参考图.png <span style="color:var(--brand);font-size:16px">← 素材来源</span><br>🗂️ 历史 / 往期晨报…</div>`,{ry0:6,ry:25,dx:-80});
+  $('#co-misc').style.left='1180px';$('#co-misc').style.top='600px';
+  cursorPath(t,[[0,[1500,600]],[1.2,'#in-ws',1,300,0],[sel-.4,'#ws-ai',0],[sel,'#ws-ai',1],[T[3],'#ws-ai',0,200,80]]);}});
+
+scene({el:'#s-app',ch:'02 · 第三步：写提示词',cues:['第三步，写提示词，这是全流程关键的一步。',['自动化没有聊天上下文，',1.0],['你平时聊天可以省的话，这里一个字都不能省。',.8],'标准写法把信息写全，比如：',['“每天早上八点，整理五条 AI 行业的热点新闻，每条附原文链接，按热度排序，存成一个文档。”',2.0],['什么时候、干几件、什么格式、存到哪，全在里头。',3.4]],
+ r(t,T){appCommon();stepper(3);
+  const ta=T[4]-.4;const n=Math.floor(Math.max(0,t-ta)*7.5);
+  const hl={};const hs=T[5]+.2;['when','count','fmt','where'].forEach((k,i)=>{if(t>=hs+i*.9)hl[k]=1;});
+  formState({name:'每日AI热点晨报',ws:'~/WorkBuddy/AI热点',active:'prompt',prompt:t>=ta?n:undefined,hl,caret:caret(t),run:'none',freq:1});
+  camera(t,[[0,'#f-ws',1.6,6,8,960,420],[1.0,'#f-prompt',1.25,5,-6,960,470],[T[1],'#f-prompt',1.12,5,14,720,470],[T[4]-.6,'#f-prompt',1.5,3,-4,960,430],[T[5]+.1,'#f-prompt',1.3,4,-8,960,400],[T[6],'#f-prompt',1.3,4,-8,960,400]],t);
+  coShow('#co-ctx',t,T[1]+.2,T[4]-.5,`<div class="k">⚠ 自动化 ≠ 聊天</div>
+    <div style="display:flex;gap:16px;margin-top:12px">
+      <div style="flex:1;background:#f4f5fa;border-radius:12px;padding:12px 14px;font-size:18px;line-height:1.7"><b>💬 聊天</b><br><span style="color:var(--ink3)">前面聊过的它都记得</span><br>“还按上次那样弄” ✓</div>
+      <div style="flex:1;background:var(--badSoft);border-radius:12px;padding:12px 14px;font-size:18px;line-height:1.7"><b>⚙️ 自动化</b><br><span style="color:var(--ink3)">每次从零开始</span><br>“还按上次那样弄” <b style="color:var(--bad)">？？</b></div></div>`+
+    (t>=T[2]?`<div style="margin-top:14px;font-size:24px;font-weight:900">聊天可以省的话，这里 <span style="color:var(--bad)">一个字都不能省</span></div>`:''),{ry0:6,ry:30,dx:-100});
+  const lg=[['when','什么时候','每天早上八点','var(--c1)'],['count','干几件','五条 AI 热点新闻','var(--c2)'],['fmt','什么格式','附链接 · 按热度排序','var(--c3)'],['where','存到哪','存成一个文档','var(--c4)']];
+  coShow('#co-legend',t,hs-.1,99,`<div style="display:flex;gap:18px;align-items:center">`+lg.map(([k,a,b,c],i)=>`<div style="flex:1;border-radius:14px;padding:10px 16px;border:3px solid ${c};opacity:${t>=hs+i*.9?1:.15};transform:translateY(${t>=hs+i*.9?0:20}px)"><div style="font-size:18px;color:${c};font-weight:900">${a}</div><div style="font-size:20px;font-weight:700">${b}</div></div>`).join('')+(t>=T[5]+4?`<div style="font-size:26px;font-weight:900;color:var(--ok)">✓ 全在里头</div>`:'')+`</div>`,{dx:0,dy:80,ry:0,ry0:0});
+  cursorState=null;}});
+
+scene({el:'#s-app',ch:'02 · 第四步：模型与技能',cues:['第四步，选模型和技能。',['默认权限就够用；',.8],['涉及删除文件这类敏感操作的，慎重开“完全访问”。',2.0]],
+ r(t,T){appCommon();stepper(4);
+  const s1=1.2,s2=1.9;const tip=t>=T[2]+.4;
+  formState({name:'每日AI热点晨报',ws:'~/WorkBuddy/AI热点',prompt:PLEN,hl:{},skills:t>=s2?2:t>=s1?1:0,tip,run:'none',freq:1});
+  if(t>=T[1]&&t<T[2])glow('#pm-def',true);else glow('#pm-def',false);
+  camera(t,[[0,'#f-prompt',1.3,4,-8,960,400],[1.0,'#f-model',1.55,5,10,1000,460],[T[3],'#f-model',1.55,5,10,1000,460]],t);
+  cursorPath(t,[[0,[1300,700]],[s1,'#sk1',1],[s2,'#sk2',1],[T[1]+.4,'#pm-def',1,-40,0],[T[2]+.4,'#pm-full',0,-40,0],[T[3],'#pm-full',0,-40,0]]);}});
+
+scene({el:'#s-app',ch:'02 · 第五步：设频率',cues:[['第五步，设频率。',1.0],['每天、每周几、每月几号，按任务性质选。',3.2]],
+ r(t,T){appCommon();stepper(5);
+  const a=T[1]+.3;const ph=t<a?1:t<a+1.2?1:t<a+2.6?2:t<a+4.0?3:1;
+  const fx=ph===2?['一','二','三','四','五','六','日'].map((d,i)=>`<span style="padding:3px 9px;border-radius:6px;${i===0||i===4?'background:var(--brand);color:#fff':'background:#f2f3f8'}">周${d}</span>`).join(''):ph===3?`每月 <span style="padding:3px 12px;border-radius:6px;background:var(--brand);color:#fff">1 号</span> 执行`:`每天 08:00 执行`;
+  formState({name:'每日AI热点晨报',ws:'~/WorkBuddy/AI热点',prompt:PLEN,skills:2,run:'none',freq:ph,freqX:fx});
+  camera(t,[[0,'#f-model',1.55,5,10,1000,460],[1.0,'#f-freq',1.7,4,-10,1000,460],[T[2],'#f-freq',1.7,4,-10,1000,460]],t);
+  coShow('#co-misc',t,a,99,`<div class="k">按任务性质选</div><div style="font-size:21px;line-height:1.9;margin-top:6px">📰 热点晨报 → <b>每天</b><br>📊 周报汇总 → <b>每周几</b><br>🧾 月度账单 → <b>每月几号</b></div>`,{ry0:-6});
+  $('#co-misc').style.left='140px';$('#co-misc').style.top='640px';
+  cursorPath(t,[[0,[1300,700]],[.9,'#seg div:nth-child(2)',1],[a+1.2,'#seg div:nth-child(3)',1],[a+2.6,'#seg div:nth-child(4)',1],[a+4.0,'#seg div:nth-child(2)',1],[T[2],'#seg div:nth-child(2)',0,40,40]]);}});
+
+scene({el:'#s-app',ch:'02 · 第六步：推送与测试',cues:[['第六步，开微信或企业微信推送，然后点测试运行。',2.2],['看到状态变成“已触发”，就是生效了。',3.4]],
+ r(t,T){appCommon();stepper(6);
+  const w1=1.0,w2=1.8,tb=T[1]-.3,ok=tb+1.6;
+  formState({name:'每日AI热点晨报',ws:'~/WorkBuddy/AI热点',prompt:PLEN,skills:2,run:t>=ok?'ok':t>=tb?'run':'none',freq:1,freqX:'每天 08:00 执行',wx:t>=w1,wk:t>=w2});
+  if(t>=ok)glow('#run-st',true);
+  camera(t,[[0,'#f-freq',1.7,4,-10,1000,460],[.9,'#f-push',1.7,4,8,900,500],[ok+.2,'#f-push',1.7,4,8,900,500],[ok+1.2,null,.88,6,-14,720,520],[T[2],null,.88,6,-14,720,520]],t);
+  const ph=$('#phone');const pp=prog(t,ok+1.0,.9);ph.style.opacity=clamp(pp*2);const e=eback(pp);
+  ph.style.transform=`perspective(1400px) translate3d(${(1-e)*300}px,${(1-e)*60}px,${(1-e)*-600}px) rotateY(${-22+(1-e)*-50}deg) rotateX(4deg)`;
+  const nt=$('#notif');const np=eback(prog(t,ok+1.8,.6));nt.style.transform=`translateY(${(1-np)*-160}px) scale(${.9+.1*np})`;nt.style.opacity=clamp(np);
+  cursorPath(t,[[0,[1300,700]],[w1,'#sw-wx',1],[w2,'#sw-wk',1],[tb,'#btn-test',1],[ok+1,'#btn-test',0,60,60]]);}});
+
+scene({el:'#s-test',ch:'02 · 测试别跳过',cues:[['测试这一步别跳过——',.6],['宁可测试时多跑一次，',1.0],['不要上线后连续跑错一周。',3.0]],
+ r(t,T){in3d($('#tw-a'),t,T[1]-.2,.8,{ry:40,z:-600});in3d($('#tw-b'),t,T[2]-.2,.8,{ry:-40,z:-600});
+  const tp=eback(prog(t,T[1]+.5,.6));$('#tw-test').style.transform=`scale(${.6+.4*tp}) translateZ(0)`;
+  $('#tw-cal').innerHTML=['一','二','三','四','五','六','日'].map((d,i)=>{const a=T[2]+.6+i*.28;const p=eback(prog(t,a,.45));
+    return `<div style="opacity:${clamp(p*2)};transform:perspective(600px) rotateX(${(1-p)*-90}deg);${p>0?'border-color:#ffc9c9;background:#fff5f5':''}"><span>周${d}</span><b style="color:var(--bad)">✗</b></div>`;}).join('');
+  $('#tw-sum').style.opacity=prog(t,T[2]+2.8,.5);}});
+
+chap('03','三个坑','提前说',[['三、三个坑，提前说。',.8]],'03 三个坑');
+
+scene({el:'#s-pits',ch:'03 三个坑',cues:['坑一，提示词写不全。',['刚才说了，它没有上下文，',.6],['你省的字都会变成它犯的错。',1.2],'坑二，不核对时区。',['有人设完发现半夜十二点被推送吵醒，',.8],['就是这里没对。',1.8],'坑三，任务不拆。','一个任务又查资料又做表又发邮件，',['坏一个环节全卡住。',.8],'一个任务只干一件事，',['要串联，就建多个任务排着跑。',1.8]],
+ r(t,T){
+  // ring rotation: index 0 at T0, 1 at T3, 2 at T6
+  const r1=ease(prog(t,T[3]-.4,1.0)),r2=ease(prog(t,T[6]-.4,1.0));const rot=(r1+r2)*-120;
+  const ent=eout(prog(t,0,1.0));
+  $$('.pitc').forEach((e,i)=>{let a=((i*120+rot)%360+540)%360-180;const f=Math.cos(a*Math.PI/180);
+    e.style.transform=`rotateY(${a}deg) translateZ(${700+(1-ent)*-900}px) rotateY(0deg)`;e.style.transformOrigin='50% 50% -700px';
+    e.style.opacity=clamp((f+.2)*1.4)*ent;e.style.filter=f<.95?`blur(${(1-f)*6}px)`:'none';e.style.zIndex=Math.round(f*10)+10;});
+  $('#pit-ring').style.transform=`translateZ(-700px)`;
+  // pit1
+  const qs=['几点？','几条？','什么领域？','要链接吗？','怎么排序？','存哪里？'];
+  $('#p1q').innerHTML=qs.map((q,i)=>{const p=eback(prog(t,T[1]+i*.25,.4));return `<span style="padding:6px 12px;border-radius:10px;background:var(--warnSoft);color:var(--warn);font-weight:700;opacity:${clamp(p)};transform:scale(${p});display:inline-block">❓${q}</span>`;}).join('');
+  in3d($('#p1o'),t,T[2]-.2,.6,{rx:50});$('#p1s').style.opacity=prog(t,T[2]+.8,.5);
+  // pit2
+  const bz=(t>=T[4]+.5&&t<T[5]+.8);$('#p2night').style.transform=bz?`translateX(${Math.sin(t*60)*6}px) rotate(${Math.sin(t*45)*2}deg)`:'none';
+  $('#p2buzz').style.opacity=t>=T[4]+.5?1:0;
+  $('#p2b').style.borderColor=t>=T[5]?'var(--bad)':'var(--line)';$('#p2b').style.background=t>=T[5]?'#fff5f5':'#fff';
+  in3d($('#p2c'),t,T[5]+.8,.6,{rx:50});
+  // pit3
+  const brk=t>=T[8];const m=$('#p3mid');m.style.borderColor=brk?'var(--bad)':'var(--line)';m.style.background=brk?'#fff5f5':'#fff';
+  m.style.transform=brk&&t<T[8]+1?`translateX(${Math.sin(t*60)*5}px)`:'none';if(brk)m.innerHTML='💥 做表失败';else m.innerHTML='📊 做表';
+  $$('#p3big .p3n').forEach((e,i)=>{if(i===2)e.style.opacity=brk?.35:1;});
+  $('#p3stuck').style.opacity=prog(t,T[8]+.5,.4);
+  const sp=prog(t,T[9]-.2,.5);$('#p3split').style.opacity=sp;$('#p3big').style.opacity=1-sp*.5;
+  $$('.p3s').forEach((e,i)=>in3d(e,t,T[10]+i*.35,.6,{rx:70,z:-200}));}});
+
+chap('04','五条黄金法则','口诀记住',[['四、五条黄金法则，口诀记住。',.8]],'04 黄金法则');
+
+const RULES=[['🐢','慢起步','先低频后高频','先每天一次<br>别一小时一次'],['🧱','稳一点','先跑简单的','稳定了<br>再上复杂的'],['🚨','有告警','失败要能通知你','📲 任务失败<br>立即推送'],['🧾','能追溯','每次结果有记录','08:00 ✓<br>08:00 ✓<br>08:00 ✗ 查原因'],['⏹️','随时停','发现不对','一键停掉<br>改好再开']];
+$('#rl-row').innerHTML=RULES.map((r,i)=>`<div class="panel rl" style="flex:1;padding:30px 26px;position:relative"><div style="font-size:18px;color:var(--ink3);font-weight:900">0${i+1}</div><div style="font-size:70px;margin-top:6px">${r[0]}</div><div style="font-size:42px;font-weight:900;margin-top:8px">${r[1]}</div><div style="font-size:22px;color:var(--ink2);margin-top:8px">${r[2]}</div><div class="rl-d" style="margin-top:20px;padding:16px;border-radius:14px;background:var(--brandSoft);font-size:21px;line-height:1.7;color:var(--brand);font-weight:700">${r[3]}</div></div>`).join('');
+scene({el:'#s-rules',ch:'04 黄金法则',cues:[['慢起步——先低频后高频，先每天一次别一小时一次；',.6],['稳一点——先跑简单的，稳定了再上复杂的；',.6],['有告警——失败要能通知到你；',.6],['能追溯——每次跑完的结果要有记录；',.6],['随时停——发现不对，能一键停掉改掉。',1.8]],
+ r(t,T){let act=-1;for(let i=0;i<5;i++)if(t>=T[i])act=i;const end=t>=T[4]+4.2;
+  $$('.rl').forEach((e,i)=>{const p=eback(prog(t,T[i]-.1,.8));const isA=i===act&&!end;const lift=isA?eout(prog(t,T[i]+.3,.5)):0;
+    e.style.opacity=clamp(p*2);e.style.transformOrigin='50% 100%';
+    e.style.transform=`translate3d(0,${(1-p)*120-lift*30}px,${lift*120}px) rotateX(${(1-p)*-80}deg)`;
+    e.style.boxShadow=isA?'0 40px 80px rgba(60,60,160,.28),0 0 0 3px var(--brand)':'';
+    const d=e.querySelector('.rl-d');d.style.opacity=i<act||isA||end?1:0;});}});
+
+scene({el:'#s-lap',ch:'大实话',cues:['补一句大实话：',['自动化任务执行需要电脑开着——',.6],['睡眠和关机状态下它跑不了。',1.4],['笔记本用户尤其注意，别合上盖。',2.4]],
+ r(t,T){const lap=$('#lap');const ent=eout(prog(t,0,1.0));
+  lap.style.transform=`perspective(1800px) translateZ(${(1-ent)*-800}px) rotateX(12deg) rotateY(${-22+Math.sin(t*.5)*6}deg)`;lap.style.opacity=ent;
+  // lid close at T2, reopen at T3+1.6
+  const cl=ease(prog(t,T[2]+.2,1.0))*(1-ease(prog(t,T[3]+1.8,1.0)));
+  $('#lap-lid').style.transform=`rotateX(${-12+cl*-72}deg)`;
+  const sleep=t>=T[2]+.2&&t<T[3]+2.2;$('#lap-sleep').style.opacity=sleep?prog(t,T[2]+.2,.4):0;
+  const st=$('#lap-st');st.className='st '+(sleep?'off':'on');st.textContent=sleep?'✗ 未执行':'● 运行中';
+  coShow('#lap-co2',t,T[1],99,`<div class="k">电脑状态</div><div style="font-size:24px;line-height:1.9;margin-top:6px">💻 开机 · 亮屏 → <b style="color:var(--ok)">✓ 能跑</b><br>💤 睡眠 → <b style="color:var(--bad)">✗ 跑不了</b><br>⏻ 关机 → <b style="color:var(--bad)">✗ 跑不了</b></div>`,{ry0:8,ry:30,dx:-80});
+  coShow('#lap-co',t,T[3],99,`<div style="font-size:40px">💻⚠️</div><div style="font-size:30px;font-weight:900;margin-top:6px">笔记本用户</div><div style="font-size:26px;margin-top:4px">任务时间段，<b style="color:var(--warn)">别合上盖</b></div>`);}});
+
+scene({el:'#s-val',ch:'价值收尾',cues:['这套东西跑起来之后你会有三个感受：',['省脑子——到点自动跑，你不用惦记；',.8],['保稳定——流程固定，输出质量不飘；',.8],['可积累——每天的数据越攒越多，越用越聪明。',2.0]],
+ r(t,T){$$('.vc').forEach((e,i)=>{const p=eback(prog(t,T[i+1]-.3,.8));const act=t>=T[i+1]&&t<T[i+2];
+   e.style.opacity=clamp(p*2);e.style.transform=`translate3d(0,${(1-p)*80}px,${(1-p)*-700+(act?60:0)}px) rotateY(${(1-p)*(i-1)*-45}deg)`;});
+  $('#v1').style.opacity=prog(t,T[1]+.8,.5);
+  $('#v2l').style.strokeDashoffset=400*(1-prog(t,T[2]+.6,1.2));
+  const bars=[];const g=prog(t,T[3]+.4,2.4);for(let i=0;i<12;i++){const h=Math.max(0,(g*12-i))>0?Math.min(1,g*12-i)*(18+i*7.5):0;bars.push(`<div style="flex:1;height:${h}px;border-radius:5px;background:linear-gradient(180deg,var(--brand2),var(--brand))"></div>`);}
+  $('#v3').innerHTML=bars.join('');}});
+
+scene({el:'#s-next',ch:'下期预告',cues:['下期教你把这套东西装进手机：',['搭一个自己的工作台。',1.0],['想跟着做，评论区扣个“教程”，',1.4],['我把自动化模板和提示词范例发给你。',2.6]],
+ r(t,T){in3d($('#nx-card'),t,.2,.8,{ry:30,z:-700});
+  const ph=$('#nx-phone');const pp=eback(prog(t,T[1]-.3,1.0));ph.style.opacity=clamp(pp*2);
+  ph.style.transform=`perspective(1600px) translate3d(0,${(1-pp)*200}px,${(1-pp)*-900}px) rotateY(${-20+Math.sin(t*.8)*8+(1-pp)*-180}deg) rotateX(6deg)`;
+  in3d($('#nx-cmt'),t,T[2],.7,{rx:40});
+  $('#nx-in').innerHTML=typed('教程',t,T[2]+.9,3)+(t<T[3]+.6?caret(t):'');
+  in3d($('#nx-reply'),t,T[3]+.8,.6,{rx:50});}});
+
+/* ---- timeline ---- */
+const CPS=5.4,BASE=.7;const plain=s=>s.replace(/<[^>]+>/g,'');
+let cur=0;const CUES=[];
+for(const sc of S){sc.start=cur;sc.T=[];let lt=0;
+  for(const c of sc.cues){const[txt,hold]=Array.isArray(c)?c:[c,0];const d=Math.max(2.0,BASE+[...plain(txt)].length/CPS)+hold;sc.T.push(lt);CUES.push({s:cur+lt,e:cur+lt+d-.15,text:plain(txt)});lt+=d;}
+  sc.T.push(lt);sc.dur=lt+.5;cur+=sc.dur;}
+const TOTAL=cur+1.2;window.TOTAL=TOTAL;window.CUES=CUES;
+
+/* ---- background ---- */
+const PTS=[];let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+for(let i=0;i<34;i++)PTS.push({x:rnd()*1920,y:rnd()*1080,z:rnd(),s:4+rnd()*8,sp:.3+rnd()*.7});
+$('#pts').innerHTML=PTS.map((p,i)=>`<div class="pt" id="pt${i}" style="width:${p.s}px;height:${p.s}px"></div>`).join('');
+function bg(t){$('#floor').style.backgroundPosition=`0 ${(t*40)%120}px`;
+  $('#orb1').style.transform=`translate(${Math.sin(t*.2)*80}px,${Math.cos(t*.25)*60}px)`;
+  $('#orb2').style.transform=`translate(${Math.cos(t*.18)*90}px,${Math.sin(t*.22)*70}px)`;
+  $('#orb3').style.transform=`translate(${Math.sin(t*.15)*120}px,${Math.cos(t*.2)*50}px)`;
+  PTS.forEach((p,i)=>{const e=$('#pt'+i);const y=((p.y-t*25*p.sp)%1080+1080)%1080;const x=p.x+Math.sin(t*.5+i)*30*p.z;
+    e.style.transform=`translate(${x}px,${y}px)`;e.style.opacity=.08+p.z*.25;e.style.filter=`blur(${(1-p.z)*3}px)`;});}
+
+/* ---- render ---- */
+const XF=.6;
+function render(t){
+  let ci=S.findIndex(s=>t>=s.start&&t<s.start+s.dur);if(ci<0)ci=S.length-1;
+  const sc=S[ci],lt=t-sc.start;bg(t);
+  $$('.scene').forEach(e=>{e.style.opacity=0;});cursorState=null;
+  const el=$(sc.el);const prev=S[ci-1],next=S[ci+1];
+  let pin=1,pout=0;
+  if(!(prev&&prev.el===sc.el))pin=eout(clamp(lt/XF));
+  if(!(next&&next.el===sc.el))pout=ease(clamp((lt-(sc.dur-XF))/XF));
+  if(ci===S.length-1)pout=ease(clamp((t-(TOTAL-1.0))/1.0));
+  el.style.opacity=pin*(1-pout);
+  el.style.transform=`translate3d(0,0,${(1-pin)*-900+pout*500}px) rotateY(${(1-pin)*14+pout*-10}deg)`;
+  // world float
+  $('#world').style.transform=`rotateX(${Math.sin(t*.3)*1.2}deg) rotateY(${Math.cos(t*.23)*1.6}deg)`;
+  sc.r(lt,sc.T);
+  const cu=$('#cursor'),rp=$('#ripple');const o=pin*(1-pout);
+  if(cursorState){cu.style.opacity=o;cu.style.transform=`translate(${cursorState.x-6}px,${cursorState.y-4}px)`;
+    if(cursorState.click){const c=cursorState.click;rp.style.opacity=(1-c.p)*o;rp.style.transform=`translate(${c.x-40}px,${c.y-40}px) scale(${.3+c.p})`;}else rp.style.opacity=0;}
+  else{cu.style.opacity=0;rp.style.opacity=0;}
+  $('#chapter').textContent=sc.ch;$('#progress').style.width=(t/TOTAL*1920)+'px';
+}
+window.render=render;
+window.warm=async()=>{for(let t=0;t<TOTAL;t+=.5)render(t);await document.fonts.ready;render(0);return TOTAL;};
+render(0);
+</script>
+</body>
+</html>
